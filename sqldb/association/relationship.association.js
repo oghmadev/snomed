@@ -1,7 +1,7 @@
 'use strict'
 
 export default function (db) {
-  db.SNOMEDStatedRelationship.Module = db.SNOMEDStatedRelationship.belongsTo(db.SNOMEDConcept, {
+  db.Relationship.Module = db.Relationship.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'moduleId'
@@ -11,7 +11,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDStatedRelationship.Source = db.SNOMEDStatedRelationship.belongsTo(db.SNOMEDConcept, {
+  db.Relationship.Source = db.Relationship.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'sourceId'
@@ -21,7 +21,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDStatedRelationship.Destination = db.SNOMEDStatedRelationship.belongsTo(db.SNOMEDConcept, {
+  db.Relationship.Destination = db.Relationship.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'destinationId'
@@ -31,7 +31,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDStatedRelationship.Type = db.SNOMEDStatedRelationship.belongsTo(db.SNOMEDConcept, {
+  db.Relationship.Type = db.Relationship.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'typeId'
@@ -41,7 +41,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDStatedRelationship.CharacteristicType = db.SNOMEDStatedRelationship.belongsTo(db.SNOMEDConcept, {
+  db.Relationship.CharacteristicType = db.Relationship.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'characteristicTypeId'
@@ -51,7 +51,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDStatedRelationship.Modifier = db.SNOMEDStatedRelationship.belongsTo(db.SNOMEDConcept, {
+  db.Relationship.Modifier = db.Relationship.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'modifierId'
@@ -61,6 +61,6 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDStatedRelationship.removeAttribute('createdAt')
-  db.SNOMEDStatedRelationship.removeAttribute('updatedAt')
+  db.Relationship.removeAttribute('createdAt')
+  db.Relationship.removeAttribute('updatedAt')
 }

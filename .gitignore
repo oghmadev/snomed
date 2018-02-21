@@ -9,16 +9,9 @@ dist
 tags
 coverage
 
-server/config/local.env.js
+config/local.env.js
 
-client/app.html
-client/assets/fonts/
-client/assets/font-awesome-4.7.0/
-
-/files/
 /logs/
 
 __pycache__
 /temp/
-/client/assets/fontawesome-pro-*/
-/bin/initialization/data/snomed/

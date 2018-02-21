@@ -4,35 +4,21 @@ import _ from 'lodash'
 import del from 'del'
 import gulp from 'gulp'
 import gulpLoadPlugins from 'gulp-load-plugins'
-import http from 'http'
-import open from 'open'
 import lazypipe from 'lazypipe'
 import nodemon from 'nodemon'
-import { Server as KarmaServer } from 'karma'
 import runSequence from 'run-sequence'
-import { protractor, webdriver_update } from 'gulp-protractor'
+import { webdriver_update } from 'gulp-protractor'
 import { Instrumenter } from 'isparta'
 import webpack from 'webpack-stream'
 import makeWebpackConfig from './webpack.make'
 
 let config
 const plugins = gulpLoadPlugins()
-const clientPath = 'client'
-const serverPath = 'server'
+const serverPath = '.'
 const paths = {
-  client: {
-    assets: `${clientPath}/assets/**/*`,
-    images: `${clientPath}/assets/images/**/*`,
-    styles: `${clientPath}/assets/styles/**/*`,
-    revManifest: `${clientPath}/assets/rev-manifest.json`,
-    scripts: [`${clientPath}/**/!(*.spec|*.mock).js`],
-    test: [`${clientPath}/{app,resources}/**/*.{spec,mock}.js`],
-    e2e: ['e2e/**/*.spec.js']
-  },
   server: {
     scripts: [`${serverPath}/**/!(*.spec|*.integration).js`, `!${serverPath}/config/local.env.sample.js`],
     json: [`${serverPath}/**/*.json`],
-    template: `${serverPath}/components/pdf/templates/**/*`,
     test: {
       integration: [`${serverPath}/**/*.integration.js`, 'mocha.global.js'],
       unit: [`${serverPath}/**/*.spec.js`, 'mocha.global.js']
@@ -45,29 +31,6 @@ const paths = {
 /********************
  * Helper functions
  ********************/
-
-function checkAppReady (cb) {
-  const options = {
-    host: 'localhost',
-    port: config.port
-  }
-
-  http.get(options, () => cb(true))
-    .on('error', () => cb(false))
-}
-
-// Call page until first success
-function whenServerReady (cb) {
-  let serverReady = false
-  const appReadyInterval = setInterval(() =>
-    checkAppReady((ready) => {
-      if (!ready || serverReady) return
-
-      clearInterval(appReadyInterval)
-      serverReady = true
-      cb()
-    }), 100)
-}
 
 /********************
  * Reusable pipelines
@@ -137,7 +100,7 @@ gulp.task('webpack:dist', () => {
 
   return gulp.src(webpackDistConfig.entry.app)
     .pipe(webpack(webpackDistConfig))
-    .on('error', err => this.emit('end')) // Recover from errors
+    .on('error', () => this.emit('end')) // Recover from errors
     .pipe(gulp.dest(`${paths.dist}/client`))
 })
 
@@ -165,21 +128,10 @@ gulp.task('transpile:server', () => gulp.src(_.union(paths.server.scripts, paths
   .pipe(plugins.sourcemaps.write('.'))
   .pipe(gulp.dest(`${paths.dist}/${serverPath}`)))
 
-gulp.task('lint:scripts', cb => runSequence(['lint:scripts:client', 'lint:scripts:server'], cb))
-
-gulp.task('lint:scripts:client', () => gulp.src(_.union(paths.client.scripts, _.map(paths.client.test, blob => `!${blob}`)))
-  .pipe(plugins.eslint(`${clientPath}/.eslintrc`))
-  .pipe(plugins.eslint.format()))
+gulp.task('lint:scripts', cb => runSequence(['lint:scripts:server'], cb))
 
 gulp.task('lint:scripts:server', () => gulp.src(_.union(paths.server.scripts, _.map(paths.server.test, blob => `!${blob}`)))
   .pipe(plugins.eslint(`${serverPath}/.eslintrc`))
-  .pipe(plugins.eslint.format()))
-
-gulp.task('lint:scripts:clientTest', () => gulp.src(paths.client.test)
-  .pipe(plugins.eslint({
-    configFile: `${clientPath}/.eslintrc`,
-    envs: ['browser', 'es6', 'mocha']
-  }))
   .pipe(plugins.eslint.format()))
 
 gulp.task('lint:scripts:serverTest', () => gulp.src(_.union(paths.server.test.integration, paths.server.test.unit))
@@ -190,13 +142,6 @@ gulp.task('lint:scripts:serverTest', () => gulp.src(_.union(paths.server.test.in
   .pipe(plugins.eslint.format()))
 
 gulp.task('clean:tmp', () => del(['.tmp/**/*'], {dot: true}))
-
-gulp.task('start:client', cb => {
-  whenServerReady(() => {
-    open(`http://localhost:${config.browserSyncPort}`)
-    cb()
-  })
-})
 
 gulp.task('start:server', () => {
   process.env.NODE_ENV = process.env.NODE_ENV || 'development'
@@ -220,21 +165,18 @@ gulp.task('start:server:debug', () => {
 })
 
 gulp.task('watch', () => {
-  gulp.watch(paths.client.scripts, ['lint:scripts:client'])
   gulp.watch(paths.server.scripts, ['lint:scripts:server'])
-  gulp.watch(paths.client.test, ['lint:scripts:clientTest'])
   gulp.watch(_.union(paths.server.test.integration, paths.server.test.unit), ['lint:scripts:serverTest'])
 })
 
-gulp.task('serve', cb => runSequence(['clean:tmp', 'lint:scripts', 'env:all'],
-  ['start:server', 'start:client'], 'watch', cb))
+gulp.task('serve', cb => runSequence(['clean:tmp', 'lint:scripts', 'env:all'], ['start:server'], 'watch', cb))
 
 gulp.task('serve:debug', cb => runSequence(['clean:tmp', 'lint:scripts', 'env:all'],
-  'webpack:dev', ['start:server:debug', 'start:client'], 'watch', cb))
+  'webpack:dev', ['start:server:debug'], 'watch', cb))
 
-gulp.task('serve:dist', cb => runSequence('build', 'env:all', 'env:prod', ['start:server:prod', 'start:client'], cb))
+gulp.task('serve:dist', cb => runSequence('build', 'env:all', 'env:prod', ['start:server:prod'], cb))
 
-gulp.task('test', cb => runSequence('test:server', 'test:client', cb))
+gulp.task('test', cb => runSequence('test:server', cb))
 
 gulp.task('test:server', cb => runSequence('env:all', 'env:test', 'mocha:unit', 'mocha:integration', cb))
 
@@ -265,23 +207,6 @@ gulp.task('coverage:integration', () => gulp.src(paths.server.test.integration)
 // Downloads the selenium webdriver
 gulp.task('webdriver_update', webdriver_update)
 
-gulp.task('test:e2e', ['webpack:e2e', 'env:all', 'env:test', 'start:server', 'webdriver_update'], cb => {
-  gulp.src(paths.client.e2e)
-    .pipe(protractor({configFile: 'protractor.conf.js'}))
-    .on('error', e => { throw e })
-    .on('end', () => { process.exit() })
-})
-
-gulp.task('test:client', done => {
-  new KarmaServer({
-    configFile: `${__dirname}/${paths.karma}`,
-    singleRun: true
-  }, err => {
-    done(err)
-    process.exit(err)
-  }).start()
-})
-
 /********************
  * Build
  ********************/
@@ -292,31 +217,6 @@ gulp.task('build', cb => {
 })
 
 gulp.task('clean:dist', () => del([`${paths.dist}/!(.git*|.openshift|Procfile)**`], {dot: true}))
-
-gulp.task('build:images', () => gulp.src(paths.client.images)
-  .pipe(plugins.imagemin([
-    plugins.imagemin.optipng({optimizationLevel: 5}),
-    plugins.imagemin.jpegtran({progressive: true}),
-    plugins.imagemin.gifsicle({interlaced: true}),
-    plugins.imagemin.svgo({plugins: [{removeViewBox: false}]})
-  ]))
-  .pipe(plugins.rev())
-  .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets/images`))
-  .pipe(plugins.rev.manifest(`${paths.dist}/${paths.client.revManifest}`, {
-    base: `${paths.dist}/${clientPath}/assets`,
-    merge: true
-  }))
-  .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets`)))
-
-gulp.task('revReplaceWebpack', () => gulp.src('dist/client/app.*.js')
-  .pipe(plugins.revReplace({manifest: gulp.src(`${paths.dist}/${paths.client.revManifest}`)}))
-  .pipe(gulp.dest('dist/client')))
-
-gulp.task('copy:extras', () => gulp.src([`${clientPath}/favicon.ico`, `${clientPath}/robots.txt`, `${clientPath}/.htaccess`], {dot: true})
-  .pipe(gulp.dest(`${paths.dist}/${clientPath}`)))
-
-gulp.task('copy:assets', () => gulp.src([paths.client.assets, `!${paths.client.images}`, `!${paths.client.styles}`])
-  .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets`)))
 
 gulp.task('copy:server', () => gulp.src(['package.json', paths.server.template], {cwdbase: true})
   .pipe(gulp.dest(paths.dist)))

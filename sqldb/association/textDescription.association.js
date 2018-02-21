@@ -1,7 +1,7 @@
 'use strict'
 
 export default function (db) {
-  db.SNOMEDDescription.Module = db.SNOMEDDescription.belongsTo(db.SNOMEDConcept, {
+  db.TextDefinition.Module = db.TextDefinition.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'moduleId'
@@ -11,7 +11,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDDescription.Concept = db.SNOMEDDescription.belongsTo(db.SNOMEDConcept, {
+  db.TextDefinition.Concept = db.TextDefinition.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'conceptId'
@@ -21,7 +21,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDDescription.Type = db.SNOMEDDescription.belongsTo(db.SNOMEDConcept, {
+  db.TextDefinition.Type = db.TextDefinition.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'typeId'
@@ -31,7 +31,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDDescription.CaseSignificance = db.SNOMEDDescription.belongsTo(db.SNOMEDConcept, {
+  db.TextDefinition.CaseSignificance = db.TextDefinition.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'caseSignificanceId'
@@ -41,6 +41,6 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDDescription.removeAttribute('createdAt')
-  db.SNOMEDDescription.removeAttribute('updatedAt')
+  db.TextDefinition.removeAttribute('createdAt')
+  db.TextDefinition.removeAttribute('updatedAt')
 }

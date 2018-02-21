@@ -1,7 +1,7 @@
 'use strict'
 
 export default function (db) {
-  db.SNOMEDConcept.Module = db.SNOMEDConcept.belongsTo(db.SNOMEDConcept, {
+  db.Concept.Module = db.Concept.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'moduleId'
@@ -11,7 +11,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.DefinitionStatus = db.SNOMEDConcept.belongsTo(db.SNOMEDConcept, {
+  db.Concept.DefinitionStatus = db.Concept.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'definitionStatusId'
@@ -21,7 +21,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.DescriptionModule = db.SNOMEDConcept.hasMany(db.SNOMEDDescription, {
+  db.Concept.DescriptionModule = db.Concept.hasMany(db.Description, {
     foreignKey: {
       allowNull: false,
       name: 'moduleId'
@@ -30,7 +30,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.DescriptionConcept = db.SNOMEDConcept.hasMany(db.SNOMEDDescription, {
+  db.Concept.DescriptionConcept = db.Concept.hasMany(db.Description, {
     foreignKey: {
       allowNull: false,
       name: 'conceptId'
@@ -40,7 +40,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.DescriptionType = db.SNOMEDConcept.hasMany(db.SNOMEDDescription, {
+  db.Concept.DescriptionType = db.Concept.hasMany(db.Description, {
     foreignKey: {
       allowNull: false,
       name: 'typeId'
@@ -49,7 +49,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.DescriptionCaseSignificance = db.SNOMEDConcept.hasMany(db.SNOMEDDescription, {
+  db.Concept.DescriptionCaseSignificance = db.Concept.hasMany(db.Description, {
     foreignKey: {
       allowNull: false,
       name: 'caseSignificanceId'
@@ -58,7 +58,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.RelationshipModule = db.SNOMEDConcept.hasMany(db.SNOMEDRelationship, {
+  db.Concept.RelationshipModule = db.Concept.hasMany(db.Relationship, {
     foreignKey: {
       allowNull: false,
       name: 'moduleId'
@@ -67,7 +67,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.RelationshipSource = db.SNOMEDConcept.hasMany(db.SNOMEDRelationship, {
+  db.Concept.RelationshipSource = db.Concept.hasMany(db.Relationship, {
     foreignKey: {
       allowNull: false,
       name: 'sourceId'
@@ -77,7 +77,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.RelationshipDestination = db.SNOMEDConcept.hasMany(db.SNOMEDRelationship, {
+  db.Concept.RelationshipDestination = db.Concept.hasMany(db.Relationship, {
     foreignKey: {
       allowNull: false,
       name: 'destinationId'
@@ -87,7 +87,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.RelationshipType = db.SNOMEDConcept.hasMany(db.SNOMEDRelationship, {
+  db.Concept.RelationshipType = db.Concept.hasMany(db.Relationship, {
     foreignKey: {
       allowNull: false,
       name: 'typeId'
@@ -96,7 +96,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.RelationshipCharacteristicType = db.SNOMEDConcept.hasMany(db.SNOMEDRelationship, {
+  db.Concept.RelationshipCharacteristicType = db.Concept.hasMany(db.Relationship, {
     foreignKey: {
       allowNull: false,
       name: 'characteristicTypeId'
@@ -105,7 +105,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.RelationshipModifier = db.SNOMEDConcept.hasMany(db.SNOMEDRelationship, {
+  db.Concept.RelationshipModifier = db.Concept.hasMany(db.Relationship, {
     foreignKey: {
       allowNull: false,
       name: 'modifierId'
@@ -114,7 +114,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.TextDefinitionModule = db.SNOMEDConcept.hasMany(db.SNOMEDTextDefinition, {
+  db.Concept.TextDefinitionModule = db.Concept.hasMany(db.TextDefinition, {
     foreignKey: {
       allowNull: false,
       name: 'moduleId'
@@ -123,7 +123,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.TextDefinitionConcept = db.SNOMEDConcept.hasMany(db.SNOMEDTextDefinition, {
+  db.Concept.TextDefinitionConcept = db.Concept.hasMany(db.TextDefinition, {
     foreignKey: {
       allowNull: false,
       name: 'conceptId'
@@ -132,7 +132,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.TextDefinitionType = db.SNOMEDConcept.hasMany(db.SNOMEDTextDefinition, {
+  db.Concept.TextDefinitionType = db.Concept.hasMany(db.TextDefinition, {
     foreignKey: {
       allowNull: false,
       name: 'typeId'
@@ -141,7 +141,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.TextDefinitionCaseSignificance = db.SNOMEDConcept.hasMany(db.SNOMEDTextDefinition, {
+  db.Concept.TextDefinitionCaseSignificance = db.Concept.hasMany(db.TextDefinition, {
     foreignKey: {
       allowNull: false,
       name: 'caseSignificanceId'
@@ -150,7 +150,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.StatedRelationshipModule = db.SNOMEDConcept.hasMany(db.SNOMEDStatedRelationship, {
+  db.Concept.StatedRelationshipModule = db.Concept.hasMany(db.StatedRelationship, {
     foreignKey: {
       allowNull: false,
       name: 'moduleId'
@@ -159,7 +159,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.StatedRelationshipSource = db.SNOMEDConcept.hasMany(db.SNOMEDStatedRelationship, {
+  db.Concept.StatedRelationshipSource = db.Concept.hasMany(db.StatedRelationship, {
     foreignKey: {
       allowNull: false,
       name: 'sourceId'
@@ -168,7 +168,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.StatedRelationshipDestination = db.SNOMEDConcept.hasMany(db.SNOMEDStatedRelationship, {
+  db.Concept.StatedRelationshipDestination = db.Concept.hasMany(db.StatedRelationship, {
     foreignKey: {
       allowNull: false,
       name: 'destinationId'
@@ -177,7 +177,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.StatedRelationshipType = db.SNOMEDConcept.hasMany(db.SNOMEDStatedRelationship, {
+  db.Concept.StatedRelationshipType = db.Concept.hasMany(db.StatedRelationship, {
     foreignKey: {
       allowNull: false,
       name: 'typeId'
@@ -186,7 +186,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.StatedRelationshipCharacteristicType = db.SNOMEDConcept.hasMany(db.SNOMEDStatedRelationship, {
+  db.Concept.StatedRelationshipCharacteristicType = db.Concept.hasMany(db.StatedRelationship, {
     foreignKey: {
       allowNull: false,
       name: 'characteristicTypeId'
@@ -195,7 +195,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.StatedRelationshipModifier = db.SNOMEDConcept.hasMany(db.SNOMEDStatedRelationship, {
+  db.Concept.StatedRelationshipModifier = db.Concept.hasMany(db.StatedRelationship, {
     foreignKey: {
       allowNull: false,
       name: 'modifierId'
@@ -204,6 +204,42 @@ export default function (db) {
     hooks: true
   })
 
-  db.SNOMEDConcept.removeAttribute('createdAt')
-  db.SNOMEDConcept.removeAttribute('updatedAt')
+  db.Concept.LanguageRefsetModule = db.Concept.hasMany(db.LanguageRefset, {
+    foreignKey: {
+      allowNull: false,
+      name: 'moduleId'
+    },
+    onDelete: 'CASCADE',
+    hooks: true
+  })
+
+  db.Concept.LanguageRefsetRefset = db.Concept.hasMany(db.LanguageRefset, {
+    foreignKey: {
+      allowNull: false,
+      name: 'refsetId'
+    },
+    onDelete: 'CASCADE',
+    hooks: true
+  })
+
+  db.Concept.LanguageRefsetReferenceComponent = db.Concept.hasMany(db.LanguageRefset, {
+    foreignKey: {
+      allowNull: false,
+      name: 'referenceComponentId'
+    },
+    onDelete: 'CASCADE',
+    hooks: true
+  })
+
+  db.Concept.LanguageRefsetAcceptability = db.Concept.hasMany(db.LanguageRefset, {
+    foreignKey: {
+      allowNull: false,
+      name: 'acceptabilityId'
+    },
+    onDelete: 'CASCADE',
+    hooks: true
+  })
+
+  db.Concept.removeAttribute('createdAt')
+  db.Concept.removeAttribute('updatedAt')
 }

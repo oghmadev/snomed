@@ -11,7 +11,6 @@ import errorHandler from 'errorhandler'
 import path from 'path'
 import lusca from 'lusca'
 import config from './environment'
-import passport from 'passport'
 import session from 'express-session'
 import sqldb from '../sqldb'
 import connectSessionSequelize from 'connect-session-sequelize'
@@ -44,10 +43,8 @@ export default function (app) {
   app.use(bodyParser.json())
   app.use(methodOverride())
   app.use(cookieParser())
-  app.use(passport.initialize())
 
   // Persist sessions with MongoStore / sequelizeStore
-  // We need to enable sessions for passport-twitter because it's an
   // oauth 1.0 strategy, and Lusca depends on sessions
   app.use(session({
     secret: config.secrets.session,
@@ -78,7 +75,7 @@ export default function (app) {
     const webpackDevMiddleware = require('webpack-dev-middleware')
     const stripAnsi = require('strip-ansi')
     const webpack = require('webpack')
-    const makeWebpackConfig = require('../../webpack.make')
+    const makeWebpackConfig = require('../webpack.make')
     const webpackConfig = makeWebpackConfig({DEV: true})
     const compiler = webpack(webpackConfig)
     const browserSync = require('browser-sync').create()
