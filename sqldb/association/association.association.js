@@ -36,7 +36,7 @@ export default function (db) {
       allowNull: false,
       name: 'targetComponentId'
     },
-    as: 'acceptability',
+    as: 'targetComponent',
     onDelete: 'CASCADE',
     hooks: true
   })
