@@ -2,7 +2,7 @@
 
 module.exports = {
   sequelize: {
-    database: 'sisa-test',
+    database: 'snomed-test',
     username: 'userTest',
     password: 'test',
     options: {

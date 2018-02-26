@@ -13,7 +13,7 @@ module.exports = {
   ip: process.env.OPENSHIFT_NODEJS_IP || process.env.ip || undefined,
   port: process.env.OPENSHIFT_NODEJS_PORT || process.env.port || 8080,
   sequelize: {
-    database: 'sisa-prod',
+    database: 'snomed-prod',
     username: 'userProd',
     password: 'test',
     options: {

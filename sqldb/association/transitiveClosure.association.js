@@ -1,21 +1,29 @@
 'use strict'
 
 export default function (db) {
-  db.Concept.Subtype = db.Concept.belongsToMany(db.Concept, {
-    foreignKey: 'supertypeId',
-    otherKey: 'subtypeId',
-    through: 'TransitiveClosure',
+  db.TransitiveClosure.Subtype = db.TransitiveClosure.belongsTo(db.Concept, {
+    foreignKey: {
+      allowNull: false,
+      primaryKey: true,
+      name: 'subtypeId'
+    },
+    as: 'subtype',
     onDelete: 'CASCADE',
-    as: 'subtypeTransitiveClosure',
     hooks: true
   })
 
-  db.Concept.Supertype = db.Concept.belongsToMany(db.Concept, {
-    foreignKey: 'subtypeId',
-    otherKey: 'supertypeId',
-    through: 'TransitiveClosure',
+  db.TransitiveClosure.Supertype = db.TransitiveClosure.belongsTo(db.Concept, {
+    foreignKey: {
+      allowNull: false,
+      primaryKey: true,
+      name: 'supertypeId'
+    },
+    as: 'supertype',
     onDelete: 'CASCADE',
-    as: 'supertypeTransitiveClosure',
     hooks: true
   })
+
+  db.TransitiveClosure.removeAttribute('id')
+  db.TransitiveClosure.removeAttribute('updatedAt')
+  db.TransitiveClosure.removeAttribute('updatedAt')
 }

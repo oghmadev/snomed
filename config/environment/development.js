@@ -10,8 +10,8 @@ const sqlPath = `${filesDir.join('/')}/sql`
 
 module.exports = {
   sequelize: {
-    database: 'sisa-dev',
-    username: 'sisa-dev',
+    database: 'snomed-dev',
+    username: 'snomed-dev',
     password: 'test',
     options: {
       host: 'localhost',
