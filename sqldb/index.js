@@ -15,7 +15,7 @@ db.Relationship = db.sequelize.import('./model/relationship.model')
 db.TextDefinition = db.sequelize.import('./model/textDefinition.model')
 db.StatedRelationship = db.sequelize.import('./model/statedRelationship.model')
 db.LanguageRefset = db.sequelize.import('./model/languageRefset.model')
-db.Associaton = db.sequelize.import('./model/association.model')
+db.Association = db.sequelize.import('./model/association.model')
 
 Associations(db)
 

@@ -2,7 +2,6 @@
 // http://karma-runner.github.io/0.13/config/configuration-file.html
 /*eslint-env node*/
 
-import makeWebpackConfig from './webpack.make'
 
 module.exports = function (config) {
   config.set({
@@ -49,7 +48,6 @@ module.exports = function (config) {
       require('karma-spec-reporter'),
       require('karma-phantomjs-launcher'),
       require('karma-script-launcher'),
-      require('karma-webpack'),
       require('karma-sourcemap-loader')
     ],
 

@@ -1,7 +1,7 @@
 'use strict'
 
 export default function (db) {
-  db.Associaton.Module = db.Associaton.belongsTo(db.Concept, {
+  db.Association.Module = db.Association.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'moduleId'
@@ -11,7 +11,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.Associaton.Refset = db.Associaton.belongsTo(db.Concept, {
+  db.Association.Refset = db.Association.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'refsetId'
@@ -21,7 +21,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.Associaton.ReferenceComponent = db.Associaton.belongsTo(db.Concept, {
+  db.Association.ReferenceComponent = db.Association.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'referenceComponentId'
@@ -31,7 +31,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.Associaton.TargetComponent = db.Associaton.belongsTo(db.Concept, {
+  db.Association.TargetComponent = db.Association.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
       name: 'targetComponentId'
@@ -41,6 +41,6 @@ export default function (db) {
     hooks: true
   })
 
-  db.Associaton.removeAttribute('createdAt')
-  db.Associaton.removeAttribute('updatedAt')
+  db.Association.removeAttribute('createdAt')
+  db.Association.removeAttribute('updatedAt')
 }

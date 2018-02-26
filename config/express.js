@@ -71,53 +71,5 @@ export default function (app) {
     }))
   }
 
-  if (env === 'development') {
-    const webpackDevMiddleware = require('webpack-dev-middleware')
-    const stripAnsi = require('strip-ansi')
-    const webpack = require('webpack')
-    const makeWebpackConfig = require('../webpack.make')
-    const webpackConfig = makeWebpackConfig({DEV: true})
-    const compiler = webpack(webpackConfig)
-    const browserSync = require('browser-sync').create()
-
-    /**
-     * Run Browsersync and use middleware for Hot Module Replacement
-     */
-    browserSync.init({
-      open: false,
-      logFileChanges: false,
-      proxy: 'localhost:' + config.port,
-      ws: true,
-      ghostMode: false,
-      middleware: [
-        webpackDevMiddleware(compiler, {
-          noInfo: false,
-          stats: {
-            modules: false,
-            colors: true,
-            timings: true,
-            chunks: false
-          }
-        })
-      ],
-      port: config.browserSyncPort,
-      plugins: ['bs-fullscreen-message']
-    })
-
-    compiler.plugin('done', function (stats) {
-      logger.common.info('webpack done hook')
-
-      if (stats.hasErrors() || stats.hasWarnings()) {
-        return browserSync.sockets.emit('fullscreen:message', {
-          title: 'Webpack Error:',
-          body: stripAnsi(stats.toString()),
-          timeout: 100000
-        })
-      }
-
-      browserSync.reload()
-    })
-  }
-
   if (env === 'development' || env === 'test') app.use(errorHandler()) // Error handler - has to be last
 }

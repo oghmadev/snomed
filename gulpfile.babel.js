@@ -10,7 +10,6 @@ import runSequence from 'run-sequence'
 import { webdriver_update } from 'gulp-protractor'
 import { Instrumenter } from 'isparta'
 import webpack from 'webpack-stream'
-import makeWebpackConfig from './webpack.make'
 
 let config
 const plugins = gulpLoadPlugins()
@@ -85,40 +84,6 @@ gulp.task('env:prod', () => {
 /********************
  * Tasks
  ********************/
-
-gulp.task('webpack:dev', () => {
-  const webpackDevConfig = makeWebpackConfig({DEV: true})
-
-  return gulp.src(webpackDevConfig.entry.app)
-    .pipe(plugins.plumber())
-    .pipe(webpack(webpackDevConfig))
-    .pipe(gulp.dest('.tmp'))
-})
-
-gulp.task('webpack:dist', () => {
-  const webpackDistConfig = makeWebpackConfig({BUILD: true})
-
-  return gulp.src(webpackDistConfig.entry.app)
-    .pipe(webpack(webpackDistConfig))
-    .on('error', () => this.emit('end')) // Recover from errors
-    .pipe(gulp.dest(`${paths.dist}/client`))
-})
-
-gulp.task('webpack:test', () => {
-  const webpackTestConfig = makeWebpackConfig({TEST: true})
-
-  return gulp.src(webpackTestConfig.entry.app)
-    .pipe(webpack(webpackTestConfig))
-    .pipe(gulp.dest('.tmp'))
-})
-
-gulp.task('webpack:e2e', () => {
-  const webpackE2eConfig = makeWebpackConfig({E2E: true})
-
-  return gulp.src(webpackE2eConfig.entry.app)
-    .pipe(webpack(webpackE2eConfig))
-    .pipe(gulp.dest('.tmp'))
-})
 
 gulp.task('transpile:server', () => gulp.src(_.union(paths.server.scripts, paths.server.json))
   .pipe(plugins.sourcemaps.init())
