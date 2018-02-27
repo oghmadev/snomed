@@ -44,6 +44,11 @@ def init_snomed():
                     fields = ('id', 'effectiveTime', 'active', 'moduleId', 'refsetId', 'referencedComponentId', 'targetComponentId')
                     copy_from_csv(cursor, data_file, 'Association', fields)
 
+            for f in iglob(get_data_file_path('snomed/sct2_TransitiveClosure*.txt')):
+                with open(f, 'r') as data_file:
+                    fields = ('supertypeId', 'subtypeId')
+                    copy_from_csv(cursor, data_file, 'TransitiveClosure', fields)
+
             connection.commit()
 
 

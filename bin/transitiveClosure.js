@@ -80,21 +80,10 @@ csv({delimiter: 'auto'})
       if (parent != null && child != null) break
     }
 
-    if (child == null) {
-      child = {
-        title: obj.destinationId,
-        children: []
-      }
-    }
+    child = child || {title: obj.destinationId, children: []}
 
-    if (parent == null) {
-      graph.push({
-        title: obj.sourceId,
-        children: [child]
-      })
-    } else {
-      parent.children.push(child)
-    }
+    if (parent == null) graph.push({title: obj.sourceId, children: [child]})
+    else parent.children.push(child)
   })
   .on('done', () => {
     transformStream.pipe(outputStream)

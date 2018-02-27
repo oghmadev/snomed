@@ -24,6 +24,6 @@ export default function (db) {
   })
 
   db.TransitiveClosure.removeAttribute('id')
-  db.TransitiveClosure.removeAttribute('updatedAt')
+  db.TransitiveClosure.removeAttribute('createdAt')
   db.TransitiveClosure.removeAttribute('updatedAt')
 }
