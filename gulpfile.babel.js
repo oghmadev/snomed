@@ -9,19 +9,14 @@ import nodemon from 'nodemon'
 import runSequence from 'run-sequence'
 import { webdriver_update } from 'gulp-protractor'
 import { Instrumenter } from 'isparta'
-import webpack from 'webpack-stream'
 
 let config
 const plugins = gulpLoadPlugins()
-const serverPath = '.'
 const paths = {
-  server: {
-    scripts: [`${serverPath}/**/!(*.spec|*.integration).js`, `!${serverPath}/config/local.env.sample.js`],
-    json: [`${serverPath}/**/*.json`],
-    test: {
-      integration: [`${serverPath}/**/*.integration.js`, 'mocha.global.js'],
-      unit: [`${serverPath}/**/*.spec.js`, 'mocha.global.js']
-    }
+  scripts: [`./app.js`, `./index.js`, `./(api|component|config)/**/!(*.spec|*.integration).js`, `!./config/local.env.sample.js`],
+  test: {
+    integration: [`./**/*.integration.js`, 'mocha.global.js'],
+    unit: [`./**/*.spec.js`, 'mocha.global.js']
   },
   karma: 'karma.conf.js',
   dist: 'dist'
@@ -65,7 +60,7 @@ gulp.task('env:all', () => {
   let localConfig
 
   try {
-    localConfig = require(`./${serverPath}/config/local.env`)
+    localConfig = require(`./config/local.env`)
   } catch (e) {
     localConfig = {}
   }
@@ -85,87 +80,82 @@ gulp.task('env:prod', () => {
  * Tasks
  ********************/
 
-gulp.task('transpile:server', () => gulp.src(_.union(paths.server.scripts, paths.server.json))
+gulp.task('transpile', () => gulp.src(paths.scripts)
   .pipe(plugins.sourcemaps.init())
   .pipe(plugins.babel({
     plugins: ['transform-class-properties', 'transform-runtime']
   }))
   .pipe(plugins.sourcemaps.write('.'))
-  .pipe(gulp.dest(`${paths.dist}/${serverPath}`)))
+  .pipe(gulp.dest(`${paths.dist}`)))
 
-gulp.task('lint:scripts', cb => runSequence(['lint:scripts:server'], cb))
-
-gulp.task('lint:scripts:server', () => gulp.src(_.union(paths.server.scripts, _.map(paths.server.test, blob => `!${blob}`)))
-  .pipe(plugins.eslint(`${serverPath}/.eslintrc`))
+gulp.task('lint:scripts', () => gulp.src(_.union(paths.scripts, _.map(paths.test, blob => `!${blob}`)))
+  .pipe(plugins.eslint(`.eslintrc`))
   .pipe(plugins.eslint.format()))
 
-gulp.task('lint:scripts:serverTest', () => gulp.src(_.union(paths.server.test.integration, paths.server.test.unit))
+gulp.task('lint:scripts:test', () => gulp.src(_.union(paths.test.integration, paths.test.unit))
   .pipe(plugins.eslint({
-    configFile: `${serverPath}/.eslintrc`,
+    configFile: `.eslintrc`,
     envs: ['node', 'es6', 'mocha']
   }))
   .pipe(plugins.eslint.format()))
 
 gulp.task('clean:tmp', () => del(['.tmp/**/*'], {dot: true}))
 
-gulp.task('start:server', () => {
+gulp.task('start', () => {
   process.env.NODE_ENV = process.env.NODE_ENV || 'development'
-  config = require(`./${serverPath}/config/environment`)
+  config = require(`./config/environment`)
 
-  nodemon(`-w ${serverPath} ${serverPath}`)
+  nodemon(`-w . .`)
 })
 
-gulp.task('start:server:prod', () => {
+gulp.task('start:prod', () => {
   process.env.NODE_ENV = process.env.NODE_ENV || 'production'
-  config = require(`./${paths.dist}/${serverPath}/config/environment`)
+  config = require(`./${paths.dist}/config/environment`)
 
-  nodemon(`-w ${paths.dist}/${serverPath} ${paths.dist}/${serverPath}`)
+  nodemon(`-w ${paths.dist} ${paths.dist}`)
 })
 
-gulp.task('start:server:debug', () => {
+gulp.task('start:debug', () => {
   process.env.NODE_ENV = process.env.NODE_ENV || 'development'
-  config = require(`./${serverPath}/config/environment`)
+  config = require(`./config/environment`)
 
-  nodemon(`-w ${serverPath} --debug=5858 --debug-brk ${serverPath}`)
+  nodemon(`-w . --debug=5858 --debug-brk .`)
 })
 
 gulp.task('watch', () => {
-  gulp.watch(paths.server.scripts, ['lint:scripts:server'])
-  gulp.watch(_.union(paths.server.test.integration, paths.server.test.unit), ['lint:scripts:serverTest'])
+  gulp.watch(paths.scripts, ['lint:scripts'])
+  gulp.watch(_.union(paths.test.integration, paths.test.unit), ['lint:scripts:test'])
 })
 
-gulp.task('serve', cb => runSequence(['clean:tmp', 'lint:scripts', 'env:all'], ['start:server'], 'watch', cb))
+gulp.task('serve', cb => runSequence(['clean:tmp', 'lint:scripts', 'env:all'], ['start'], 'watch', cb))
 
-gulp.task('serve:debug', cb => runSequence(['clean:tmp', 'lint:scripts', 'env:all'],
-  'webpack:dev', ['start:server:debug'], 'watch', cb))
+gulp.task('serve:debug', cb => runSequence(['clean:tmp', 'lint:scripts', 'env:all'], ['start:debug'], 'watch', cb))
 
-gulp.task('serve:dist', cb => runSequence('build', 'env:all', 'env:prod', ['start:server:prod'], cb))
+gulp.task('serve:dist', cb => runSequence('build', 'env:all', 'env:prod', ['start:prod'], cb))
 
-gulp.task('test', cb => runSequence('test:server', cb))
+gulp.task('test', cb => runSequence('env:all', 'env:test', 'mocha:unit', 'mocha:integration', cb))
 
-gulp.task('test:server', cb => runSequence('env:all', 'env:test', 'mocha:unit', 'mocha:integration', cb))
-
-gulp.task('mocha:unit', () => gulp.src(paths.server.test.unit)
+gulp.task('mocha:unit', () => gulp.src(paths.test.unit)
   .pipe(mocha()))
 
-gulp.task('mocha:integration', () => gulp.src(paths.server.test.integration)
+gulp.task('mocha:integration', () => gulp.src(paths.test.integration)
   .pipe(mocha()))
 
 gulp.task('test:server:coverage', cb => runSequence('coverage:pre', 'env:all', 'env:test', 'coverage:unit',
   'coverage:integration', cb))
 
-gulp.task('coverage:pre', () => gulp.src(paths.server.scripts)
+gulp.task('coverage:pre', () => gulp.src(paths.scripts)
   .pipe(plugins.istanbul({
     instrumenter: Instrumenter, // Use the isparta instrumenter (code coverage for ES6)
     includeUntested: true
   }))
   .pipe(plugins.istanbul.hookRequire()))
 
-gulp.task('coverage:unit', () => gulp.src(paths.server.test.unit)
+gulp.task('coverage:unit', () => gulp.src(paths.test.unit)
   .pipe(mocha())
   .pipe(istanbul()))
 
-gulp.task('coverage:integration', () => gulp.src(paths.server.test.integration)
+gulp.task('coverage:integration', () => gulp.src(paths.test.integration)
   .pipe(mocha())
   .pipe(istanbul()))
 
@@ -177,11 +167,10 @@ gulp.task('webdriver_update', webdriver_update)
  ********************/
 
 gulp.task('build', cb => {
-  runSequence(['clean:dist', 'clean:tmp'], 'transpile:server', ['build:images'],
-    ['copy:extras', 'copy:assets', 'copy:server', 'webpack:dist'], 'revReplaceWebpack', cb)
+  runSequence(['clean:dist', 'clean:tmp'], 'transpile', ['copy'], 'revReplaceWebpack', cb)
 })
 
 gulp.task('clean:dist', () => del([`${paths.dist}/!(.git*|.openshift|Procfile)**`], {dot: true}))
 
-gulp.task('copy:server', () => gulp.src(['package.json', paths.server.template], {cwdbase: true})
+gulp.task('copy', () => gulp.src(['package.json', 'package-lock.json'], {cwdbase: true})
   .pipe(gulp.dest(paths.dist)))
