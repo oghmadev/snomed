@@ -21,12 +21,12 @@ export default function (db) {
     hooks: true
   })
 
-  db.Association.ReferenceComponent = db.Association.belongsTo(db.Concept, {
+  db.Association.ReferencedComponent = db.Association.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
-      name: 'referenceComponentId'
+      name: 'referencedComponentId'
     },
-    as: 'referenceComponent',
+    as: 'referencedComponent',
     onDelete: 'CASCADE',
     hooks: true
   })

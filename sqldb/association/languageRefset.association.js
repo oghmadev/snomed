@@ -21,12 +21,12 @@ export default function (db) {
     hooks: true
   })
 
-  db.LanguageRefset.ReferenceComponent = db.LanguageRefset.belongsTo(db.Concept, {
+  db.LanguageRefset.ReferencedComponent = db.LanguageRefset.belongsTo(db.Concept, {
     foreignKey: {
       allowNull: false,
-      name: 'referenceComponentId'
+      name: 'referencedComponentId'
     },
-    as: 'referenceComponent',
+    as: 'referencedComponent',
     onDelete: 'CASCADE',
     hooks: true
   })

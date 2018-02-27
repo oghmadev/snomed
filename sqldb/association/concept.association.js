@@ -222,16 +222,16 @@ export default function (db) {
     hooks: true
   })
 
-  db.Concept.LanguageRefsetReferenceComponent = db.Concept.hasMany(db.LanguageRefset, {
+  db.Concept.LanguageRefsetReferencedComponent = db.Concept.hasMany(db.LanguageRefset, {
     foreignKey: {
       allowNull: false,
-      name: 'referenceComponentId'
+      name: 'referencedComponentId'
     },
     onDelete: 'CASCADE',
     hooks: true
   })
 
-  db.Concept.AssociationAcceptability = db.Concept.hasMany(db.Association, {
+  db.Concept.LanguageRefsetAcceptability = db.Concept.hasMany(db.Association, {
     foreignKey: {
       allowNull: false,
       name: 'acceptabilityId'
@@ -258,10 +258,10 @@ export default function (db) {
     hooks: true
   })
 
-  db.Concept.AssociationReferenceComponent = db.Concept.hasMany(db.Association, {
+  db.Concept.AssociationReferencedComponent = db.Concept.hasMany(db.Association, {
     foreignKey: {
       allowNull: false,
-      name: 'referenceComponentId'
+      name: 'referencedComponentId'
     },
     onDelete: 'CASCADE',
     hooks: true
