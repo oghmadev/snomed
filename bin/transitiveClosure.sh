@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 TEMP_PATH="/tmp/relationship"
-DATA_PATH="./bin/data/snomed"
+DATA_PATH="./bin/data"
 
 cp "${DATA_PATH}/sct2_Relationship_Snapshot_INT_20180131.txt" "${TEMP_PATH}.txt"
 sed '1d' "${DATA_PATH}/sct2_Relationship_SpanishExtensionSnapshot_INT_20171031.txt" >> "${TEMP_PATH}.txt"
