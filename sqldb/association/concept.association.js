@@ -231,7 +231,7 @@ export default function (db) {
     hooks: true
   })
 
-  db.Concept.LanguageRefsetAcceptability = db.Concept.hasMany(db.Association, {
+  db.Concept.LanguageRefsetAcceptability = db.Concept.hasMany(db.LanguageRefset, {
     foreignKey: {
       allowNull: false,
       name: 'acceptabilityId'
