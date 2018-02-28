@@ -1,5 +1,5 @@
 CREATE INDEX description_conceptid_index
-  ON "Description" USING BTREE ("conceptId" COLLATE pg_catalog."default");
+  ON "Description" USING BTREE ("conceptId");
 
 CREATE INDEX textdefinition_conceptid_index
   ON "TextDefinition" USING BTREE ("conceptId");

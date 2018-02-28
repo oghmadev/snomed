@@ -90,7 +90,7 @@ export function hasRequestId () {
 
 export function logRequest (controllerName, functionName) {
   return (req, res, next) => {
-    logger.sirona.server.info(`${req.get('X-Request-ID')},${controllerName}.${functionName},${req.user != null ? req.user.id : 'null'}`)
+    logger.snomed.server.info(`${req.get('X-Request-ID')},${controllerName}.${functionName},${req.user != null ? req.user.id : 'null'}`)
 
     return next()
   }

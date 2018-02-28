@@ -3,8 +3,6 @@
 import path from 'path'
 
 const filesDir = path.dirname(require.main.filename).split('/')
-filesDir.pop()
-
 const logsPath = `${filesDir.join('/')}/logs`
 const sqlPath = `${filesDir.join('/')}/sql`
 

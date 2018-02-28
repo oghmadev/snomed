@@ -7,7 +7,7 @@ const errorLogger = winston.createLogger({
   level: 'error',
   format: winston.format.json(),
   transports: [new winston.transports.File({
-    filename: `${config.logsPath}/sirona.error.log`,
+    filename: `${config.logsPath}/snomed.error.log`,
     maxsize: config.logMaxSize
   })]
 })
@@ -16,7 +16,7 @@ const serverLogger = winston.createLogger({
   level: 'info',
   format: winston.format.printf(info => `${(new Date()).toISOString()},${info.message}`),
   transports: [new winston.transports.File({
-    filename: `${config.logsPath}/sirona.server.log`,
+    filename: `${config.logsPath}/snomed.server.log`,
     maxsize: config.logMaxSize
   })]
 })

@@ -1,7 +1,7 @@
 'use strict'
 
 export default function (app) {
-  // app.use('/api/snomed', require('./api/snomed'))
+  app.use('/api/findings', require('./api/finding'))
 
   // All other routes should return a 404
   app.route('/*')
