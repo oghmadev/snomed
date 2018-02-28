@@ -1,3 +1,3 @@
 - Place **SNOMED CT** files in this directory.  
-- Run the `transitiveClosue.sh` script.  
+- Run the `transitiveClosure.sh` script.  
 - Run the `load_database.py` script.
