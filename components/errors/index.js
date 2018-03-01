@@ -87,6 +87,18 @@ class UserInactiveError extends AuthenticationError {
   }
 }
 
+class FeatureUnavailableError extends BaseError {
+  constructor (parent) {
+    super(parent)
+
+    this.feature = parent.feature
+    this.name = 'SnomedFeatureUnavailableError'
+    this.statusCode = 503
+
+    Error.captureStackTrace(this, this.constructor)
+  }
+}
+
 module.exports = {
   BaseError,
   APIError,
@@ -95,5 +107,6 @@ module.exports = {
   EntityError,
   AuthenticationError,
   UserNotFoundError,
-  UserInactiveError
+  UserInactiveError,
+  FeatureUnavailableError
 }

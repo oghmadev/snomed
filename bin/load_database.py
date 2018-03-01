@@ -49,6 +49,7 @@ def init_snomed():
                     copy_from_csv(cursor, data_file, 'Association', fields)
 
             for f in iglob(get_data_file_path('sct2_TransitiveClosure*.txt')):
+
                 with open(f, 'r') as data_file:
                     fields = ('subtypeId', 'supertypeId')
                     copy_from_csv(cursor, data_file, 'TransitiveClosure', fields)

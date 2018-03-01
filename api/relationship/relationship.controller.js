@@ -5,64 +5,70 @@ import { sequelize } from '../../sqldb'
 import { APIParamMissingError } from '../../components/errors'
 
 export function getParents (req, res) {
-  return new Promise((resolve, reject) => {
-    const missingParams = []
+  return Promise.resolve(utils.checkToggle('Relationship'))
+    .then(toggleError => {
+      if (toggleError != null) throw toggleError
 
-    if (req.query.skip == null) missingParams.push('skip')
-    if (req.query.limit == null) missingParams.push('limit')
-    if (req.query.conceptId == null) missingParams.push('conceptId')
+      const missingParams = []
 
-    if (missingParams.length > 0) {
-      return reject(new APIParamMissingError({
-        missingParams: missingParams,
-        endpoint: req.originalUrl,
-        method: req.method,
-        controllerFunction: getParents.name,
-        message: 'association.params.missing'
-      }))
-    }
+      if (req.query.skip == null) missingParams.push('skip')
+      if (req.query.limit == null) missingParams.push('limit')
+      if (req.query.conceptId == null) missingParams.push('conceptId')
 
-    const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
-                   FROM "TransitiveClosure" "trasitiveClosure", "Description" description
-                   WHERE "trasitiveClosure"."subtypeId" = ${req.query.conceptId} AND description.active = TRUE AND
-                   "trasitiveClosure"."supertypeId" = description."conceptId"
-                   OFFSET ${req.query.skip}
-                   LIMIT ${req.query.limit};`
+      if (missingParams.length > 0) {
+        throw new APIParamMissingError({
+          missingParams: missingParams,
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getParents.name,
+          message: 'relationship.params.missing'
+        })
+      }
 
-    return resolve(sequelize.query(query, {type: sequelize.QueryTypes.SELECT}))
-  })
+      const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
+                     FROM "TransitiveClosure" "transitiveClosure", "Description" description
+                     WHERE "transitiveClosure"."subtypeId" = ${req.query.conceptId} AND description.active = TRUE AND
+                     "transitiveClosure"."supertypeId" = description."conceptId"
+                     OFFSET ${req.query.skip}
+                     LIMIT ${req.query.limit};`
+
+      return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
+    })
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))
     .catch(utils.handleError(res, req.requestId))
 }
 
 export function getChildren (req, res) {
-  return new Promise((resolve, reject) => {
-    const missingParams = []
+  return Promise.resolve(utils.checkToggle('Relationship'))
+    .then(toggleError => {
+      if (toggleError != null) throw toggleError
 
-    if (req.query.skip == null) missingParams.push('skip')
-    if (req.query.limit == null) missingParams.push('limit')
-    if (req.query.conceptId == null) missingParams.push('conceptId')
+      const missingParams = []
 
-    if (missingParams.length > 0) {
-      return reject(new APIParamMissingError({
-        missingParams: missingParams,
-        endpoint: req.originalUrl,
-        method: req.method,
-        controllerFunction: getChildren.name,
-        message: 'association.params.missing'
-      }))
-    }
+      if (req.query.skip == null) missingParams.push('skip')
+      if (req.query.limit == null) missingParams.push('limit')
+      if (req.query.conceptId == null) missingParams.push('conceptId')
 
-    const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
-                   FROM "TransitiveClosure" "trasitiveClosure", "Description" description
-                   WHERE "trasitiveClosure"."supertypeId" = ${req.query.conceptId} AND description.active = TRUE AND
-                   "trasitiveClosure"."subtypeId" = description."conceptId"
-                   OFFSET ${req.query.skip}
-                   LIMIT ${req.query.limit};`
+      if (missingParams.length > 0) {
+        throw new APIParamMissingError({
+          missingParams: missingParams,
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getChildren.name,
+          message: 'relationship.params.missing'
+        })
+      }
 
-    return resolve(sequelize.query(query, {type: sequelize.QueryTypes.SELECT}))
-  })
+      const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
+                     FROM "TransitiveClosure" "transitiveClosure", "Description" description
+                     WHERE "transitiveClosure"."supertypeId" = ${req.query.conceptId} AND description.active = TRUE AND
+                     "transitiveClosure"."subtypeId" = description."conceptId"
+                     OFFSET ${req.query.skip}
+                     LIMIT ${req.query.limit};`
+
+      return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
+    })
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))
     .catch(utils.handleError(res, req.requestId))

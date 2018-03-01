@@ -1,6 +1,8 @@
 'use strict'
 
 import errorHandler from '../errorHandler'
+import featureToggles from '../featureToggles'
+import { FeatureUnavailableError } from '../errors'
 
 export function respondWithResult (res, statusCode) {
   statusCode = statusCode || 200
@@ -25,12 +27,12 @@ export function respondWithStatus (response, statusCode, message) {
   }
 }
 
-export function removeEntity (res) {
-  return entity => {
-    if (entity != null) {
-      return entity.remove()
-        .then(() => res.status(204).end())
-    }
+export function checkToggle (toggleName) {
+  if (!featureToggles[`is${toggleName}Toggled`]()) {
+    return new FeatureUnavailableError({
+      feature: toggleName,
+      message: `${toggleName}.feature.inactive`
+    })
   }
 }
 
