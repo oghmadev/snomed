@@ -6,6 +6,7 @@ export default function (app) {
   const API_PATH = `/api/v${version}`
 
   app.use(`${API_PATH}/auth`, require('./api/auth'))
+  app.use(`${API_PATH}/associations`, require('./api/association'))
   app.use(`${API_PATH}/descriptions`, require('./api/description'))
   app.use(`${API_PATH}/findings`, require('./api/finding'))
 
