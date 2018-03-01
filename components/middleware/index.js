@@ -1,25 +1,28 @@
 'use strict'
 
 import logger from '../../config/logs'
-import jwt from 'jsonwebtoken'
+import expressJwt from 'express-jwt'
 import compose from 'composable-middleware'
 import { User } from '../../sqldb'
+import config from '../../config/environment'
+
+const validateJwt = expressJwt({secret: config.secrets.session})
 
 export function isAuthenticated () {
   return compose()
     .use((req, res, next) => {
-      if (req.get('API-Key') == null) return res.status(403).send('Forbidden')
+      // allow access_token to be passed through query parameter as well
+      if (req.query && req.query.hasOwnProperty('access_token')) req.headers.authorization = `Bearer ${req.query.access_token}`
 
-      User.find({
-        where: {id: req.user.id},
-        attributes: ['id', 'username']
-      })
+      // IE11 forgets to set Authorization header sometimes. Pull from cookie instead.
+      if (req.query && typeof req.headers.authorization === 'undefined') req.headers.authorization = `Bearer ${req.cookies.token}`
+
+      validateJwt(req, res, next)
+    })
+    .use((req, res, next) => {
+      User.find({where: {id: req.user.id}})
         .then(user => {
-          if (user == null) return res.status(401).end()
-
-          const verification = jwt.verify(req.get('API-Key', 'snomed-secret-asd'))
-
-          if (verification.id !== user.id || verification.username !== user.username) return res.status(403).send('Forbidden')
+          if (user == null) return res.status(403).send('Forbidden')
 
           req.user = user
           next()
