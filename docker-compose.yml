@@ -1,0 +1,37 @@
+version: '3.4'
+services:
+  app:
+    build:
+      args:
+        - NODE_VERSION
+      context: .
+    ports:
+      - "9000:9000"
+    depends_on:
+      - database
+    volumes:
+      - "${PWD}:/usr/app/snomed"
+    networks:
+      default:
+      backend:
+        aliases:
+          - snomed-app
+
+  database:
+    image: postgres:${POSTGRES_VERSION}
+    ports:
+      - "6100:5432"
+    environment:
+      - POSTGRES_DB=snomed-dev
+      - POSTGRES_USER=snomed-dev
+      - POSTGRES_PASSWORD=test
+    networks:
+      default:
+      backend:
+        aliases:
+          - snomed-db
+
+networks:
+  default:
+  backend:
+    external: true
