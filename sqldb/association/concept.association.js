@@ -26,6 +26,7 @@ export default function (db) {
       allowNull: false,
       name: 'moduleId'
     },
+    as: 'descriptionModule',
     onDelete: 'CASCADE',
     hooks: true
   })
@@ -45,6 +46,7 @@ export default function (db) {
       allowNull: false,
       name: 'typeId'
     },
+    as: 'descriptionType',
     onDelete: 'CASCADE',
     hooks: true
   })
@@ -54,6 +56,7 @@ export default function (db) {
       allowNull: false,
       name: 'caseSignificanceId'
     },
+    as: 'descriptionCaseSignificance',
     onDelete: 'CASCADE',
     hooks: true
   })
@@ -63,6 +66,7 @@ export default function (db) {
       allowNull: false,
       name: 'moduleId'
     },
+    as: 'relationshipModule',
     onDelete: 'CASCADE',
     hooks: true
   })
@@ -92,6 +96,7 @@ export default function (db) {
       allowNull: false,
       name: 'typeId'
     },
+    as: 'relationshipType',
     onDelete: 'CASCADE',
     hooks: true
   })
@@ -101,6 +106,7 @@ export default function (db) {
       allowNull: false,
       name: 'characteristicTypeId'
     },
+    as: 'relationshipCharacteristicType',
     onDelete: 'CASCADE',
     hooks: true
   })

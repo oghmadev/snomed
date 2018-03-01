@@ -1,7 +1,13 @@
 'use strict'
 
+import { version } from './package'
+
 export default function (app) {
-  app.use('/api/findings', require('./api/finding'))
+  const API_PATH = `/api/v${version}`
+
+  app.use(`${API_PATH}/auth`, require('./api/auth'))
+  app.use(`${API_PATH}/descriptions`, require('./api/description'))
+  app.use(`${API_PATH}/findings`, require('./api/finding'))
 
   // All other routes should return a 404
   app.route('/*')

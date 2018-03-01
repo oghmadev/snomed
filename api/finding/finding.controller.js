@@ -1,7 +1,7 @@
 'use strict'
 
 import * as utils from '../../components/utils'
-import { Description, TransitiveClosure } from '../../sqldb'
+import { sequelize } from '../../sqldb'
 import { APIParamMissingError } from '../../components/errors'
 import constants from '../../components/constants'
 
@@ -18,18 +18,17 @@ export function getFindingsByCriteria (req, res) {
     }
 
     const criteria = req.query.criteria.trim()
+      .split(/\s/)
+      .join('%')
 
-    return resolve(TransitiveClosure.findAll({
-      where: {supertype: constants.SNOMED.HIERARCHY.FINDING},
-      include: [{
-        model: Description,
-        where: {
-          term: {$iLike: `'%${criteria}%'`},
-          conceptId: {$col: 'TransitiveClosure.subtypeId'},
-          active: true
-        }
-      }]
-    }))
+    const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
+                   FROM "TransitiveClosure" "transitiveClosure", "Description" description
+                   WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.FINDING} AND 
+                         description.active = TRUE AND "transitiveClosure"."subtypeId" = description."conceptId" AND 
+                         unaccent(description."term") ILIKE '%${criteria}%' AND 
+                         description."typeId" <> ${constants.SNOMED.TYPES.DESCRIPTION.FSN}`
+
+    return resolve(sequelize.query(query, {type: sequelize.QueryTypes.SELECT}))
   })
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))

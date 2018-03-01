@@ -9,6 +9,10 @@ def init_snomed():
 
     with get_connection(**db_config) as connection:
         with connection.cursor() as cursor:
+            cursor.execute(open(get_data_file_path('sql/indexes/indexes.sql'), 'r').read())
+
+            cursor.execute(open(get_data_file_path('sql/extensions/unaccent.sql'), 'r').read())
+
             for f in iglob(get_data_file_path('sct2_Concept*.txt')):
                 with open(f, 'r') as data_file:
                     fields = ('id', 'effectiveTime', 'active', 'moduleId', 'definitionStatusId')
