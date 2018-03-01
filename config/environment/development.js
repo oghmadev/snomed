@@ -12,7 +12,7 @@ module.exports = {
     username: 'snomed-dev',
     password: 'test',
     options: {
-      host: 'localhost',
+      host: 'snomed-db',
       dialect: 'postgres',
       pool: {
         max: 5,
