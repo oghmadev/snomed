@@ -1,7 +1,7 @@
 'use strict'
 
 import errorHandler from '../errorHandler'
-import featureToggles from '../featureToggles'
+import * as featureToggles from '../featureToggles'
 import { FeatureUnavailableError } from '../errors'
 
 export function respondWithResult (res, statusCode) {
