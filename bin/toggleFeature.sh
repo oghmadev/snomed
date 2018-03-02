@@ -37,4 +37,4 @@ FEATURE_TOGGLES="$( jq ".${1} = ${2}" ${FEATURE_FILE_PATH} )"
 
 echo ${FEATURE_TOGGLES} > ${FEATURE_FILE_PATH}
 
-curl -X GET http://localhost:9000/api/v0.0.1/features/source
+curl -s -X GET http://localhost:9000/api/v0.0.1/features/source | jq .
