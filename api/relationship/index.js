@@ -2,7 +2,7 @@
 
 import { Router } from 'express'
 import * as relationship from './relationship.controller'
-import * as middleware from '../../components/middleware/index'
+import * as middleware from '../../components/middleware'
 
 const router = new Router()
 

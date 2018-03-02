@@ -2,7 +2,7 @@
 
 import { Router } from 'express'
 import * as description from './description.controller'
-import * as middleware from '../../components/middleware/index'
+import * as middleware from '../../components/middleware'
 
 const router = new Router()
 

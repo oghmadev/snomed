@@ -12,6 +12,7 @@ coverage
 config/local.env.js
 
 /logs/
+/data/
 
 __pycache__
 /temp/

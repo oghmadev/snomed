@@ -2,52 +2,69 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError } from '../../components/errors'
+import { APIParamMissingError, FeatureUnavailableError } from '../../components/errors'
 import constants from '../../components/constants'
+import { isFeatureToggled } from '../../components/featureToggles'
 
 export function getFSN (req, res) {
-  return new Promise((resolve, reject) => {
-    if (req.params.id == null) {
-      return reject(new APIParamMissingError({
-        missingParams: ['id'],
-        endpoint: req.originalUrl,
-        method: req.method,
-        controllerFunction: getFSN.name,
-        message: 'description.conceptId.missing'
-      }))
-    }
+  return Promise.resolve(isFeatureToggled('description'))
+    .then(isToggled => {
+      if (!isToggled) {
+        throw new FeatureUnavailableError({
+          feature: 'description',
+          message: 'description.feature.inactive'
+        })
+      }
 
-    const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
-                   FROM "Description" description
-                   WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE AND
-                   description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}`
+      if (req.params.id == null) {
+        throw new APIParamMissingError({
+          missingParams: ['id'],
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getFSN.name,
+          message: 'description.conceptId.missing'
+        })
+      }
 
-    return resolve(sequelize.query(query, {type: sequelize.QueryTypes.SELECT}))
-  })
+      const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
+                     FROM "Description" description
+                     WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE AND
+                     description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}`
+
+      return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
+    })
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))
     .catch(utils.handleError(res, req.requestId))
 }
 
 export function getSynonyms (req, res) {
-  return new Promise((resolve, reject) => {
-    if (req.params.id == null) {
-      return reject(new APIParamMissingError({
-        missingParams: ['id'],
-        endpoint: req.originalUrl,
-        method: req.method,
-        controllerFunction: getFSN.name,
-        message: 'description.conceptId.missing'
-      }))
-    }
+  return Promise.resolve(isFeatureToggled('description'))
+    .then(isToggled => {
+      if (!isToggled) {
+        throw new FeatureUnavailableError({
+          feature: 'description',
+          message: 'description.feature.inactive'
+        })
+      }
 
-    const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
-                   FROM "Description" description
-                   WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE AND
-                   description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}`
+      if (req.params.id == null) {
+        throw new APIParamMissingError({
+          missingParams: ['id'],
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getFSN.name,
+          message: 'description.conceptId.missing'
+        })
+      }
 
-    return resolve(sequelize.query(query, {type: sequelize.QueryTypes.SELECT}))
-  })
+      const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
+                     FROM "Description" description
+                     WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE AND
+                     description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}`
+
+      return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
+    })
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))
     .catch(utils.handleError(res, req.requestId))

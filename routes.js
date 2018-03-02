@@ -6,9 +6,11 @@ export default function (app) {
   const API_PATH = `/api/v${version}`
 
   app.use(`${API_PATH}/auth`, require('./api/auth'))
-  app.use(`${API_PATH}/relationships`, require('./api/relationship'))
-  app.use(`${API_PATH}/descriptions`, require('./api/description'))
-  app.use(`${API_PATH}/findings`, require('./api/finding'))
+  app.use(`${API_PATH}/description`, require('./api/description'))
+  app.use(`${API_PATH}/features`, require('./api/features'))
+  app.use(`${API_PATH}/finding`, require('./api/finding'))
+  app.use(`${API_PATH}/health`, require('./api/health'))
+  app.use(`${API_PATH}/relationship`, require('./api/relationship'))
 
   // All other routes should return a 404
   app.route('/*')

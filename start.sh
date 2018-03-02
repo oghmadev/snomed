@@ -16,7 +16,7 @@ function update {
   echo "Building docker image..."
   docker-compose build
   echo "Updating node dependencies..."
-  docker run --rm -v "${PWD}:/usr/app/snomed" sirona_app npm install
+  docker run --rm -v "${PWD}:/usr/app/snomed" snomed_app npm install
 }
 
 function print_usage {
