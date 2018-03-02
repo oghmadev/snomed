@@ -83,6 +83,26 @@ export function sortById (a, b) {
   return a.id - b.id
 }
 
+export function capitalize (string) {
+  const aux = string.split(' ')
+  const out = []
+
+  for (let element of aux) {
+    out.push(aux[element].charAt(0).toUpperCase() + element.slice(1))
+  }
+
+  return out.join(' ')
+}
+
+export function secondsToTime (seconds) {
+  const hours = Math.floor(seconds / (60 * 60))
+  const minutes = Math.floor(seconds % (60 * 60) / 60)
+
+  seconds = Math.floor(seconds % 60)
+
+  return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+}
+
 export function resolveCallback (resolve, reject) {
   return (err, data) => {
     if (err != null) return reject(err)

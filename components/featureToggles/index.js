@@ -5,45 +5,84 @@ let _isDescriptionToggled = true
 let _isFindingToggled = true
 let _isRelationshipToggled = true
 
-function toggleAuthFeature (value) {
+export function toggleAuthFeature (value) {
   if (typeof value === 'boolean') _isAuthToggled = value
 }
 
-function isAuthToggled () {
+export function isAuthToggled () {
   return _isAuthToggled
 }
 
-function toggleDescriptionFeature (value) {
+export function toggleDescriptionFeature (value) {
   if (typeof value === 'boolean') _isDescriptionToggled = value
 }
 
-function isDescriptionToggled () {
+export function isDescriptionToggled () {
   return _isDescriptionToggled
 }
 
-function toggleFindingFeature (value) {
+export function toggleFindingFeature (value) {
   if (typeof value === 'boolean') _isFindingToggled = value
 }
 
-function isFindingToggled () {
+export function isFindingToggled () {
   return _isFindingToggled
 }
 
-function toggleRelationshipFeature (value) {
+export function toggleRelationshipFeature (value) {
   if (typeof value === 'boolean') _isRelationshipToggled = value
 }
 
-function isRelationshipToggled () {
+export function isRelationshipToggled () {
   return _isRelationshipToggled
 }
 
-module.exports = {
-  toggleAuthFeature,
-  isAuthToggled,
-  toggleDescriptionFeature,
-  isDescriptionToggled,
-  toggleFindingFeature,
-  isFindingToggled,
-  toggleRelationshipFeature,
-  isRelationshipToggled
+export function getFeatureStatus (featureName) {
+  if (featureName != null) {
+    switch (featureName) {
+      case 'auth':
+        return {auth: isAuthToggled() ? 'UP' : 'DOWN'}
+
+      case 'description':
+        return {description: isAuthToggled() ? 'UP' : 'DOWN'}
+
+      case 'finding':
+        return {finding: isAuthToggled() ? 'UP' : 'DOWN'}
+
+      case 'relationship':
+        return {relationship: isAuthToggled() ? 'UP' : 'DOWN'}
+
+      default:
+        return {error: `${featureName} is not a valid feature name.`}
+    }
+  }
+
+  return {
+    auth: isAuthToggled() ? 'UP' : 'DOWN',
+    finding: isFindingToggled() ? 'UP' : 'DOWN',
+    description: isDescriptionToggled() ? 'UP' : 'DOWN',
+    relationship: isRelationshipToggled() ? 'UP' : 'DOWN'
+  }
+}
+
+export function toggleFeature (featureName, value) {
+  if (featureName == null || value == null) return {error: 'featureName and value are required.'}
+  if (typeof value !== 'boolean') return {error: `${value} is not a valid value.`}
+
+  switch (featureName) {
+    case 'auth':
+      return toggleAuthFeature(value)
+
+    case 'description':
+      return toggleDescriptionFeature(value)
+
+    case 'finding':
+      return toggleFindingFeature(value)
+
+    case 'relationship':
+      return toggleRelationshipFeature(value)
+
+    default:
+      return {error: `${featureName} is not a valid feature name.`}
+  }
 }
