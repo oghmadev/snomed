@@ -7,8 +7,12 @@ import http from 'http'
 import fs from 'fs'
 import logger from './config/logs'
 import errorHandler from './components/errorHandler'
+import { createFeaturesFile } from './components/featureToggles'
 
 if (!fs.existsSync(config.logsPath)) fs.mkdirSync(config.logsPath)
+if (!fs.existsSync(config.dataPath)) fs.mkdirSync(config.dataPath)
+
+createFeaturesFile()
 
 const app = express()
 const server = http.createServer(app)

@@ -1,11 +1,11 @@
 'use strict'
 
 import { Router } from 'express'
-import * as health from './health.controller'
+import * as features from './features.controller'
 import * as middleware from '../../components/middleware'
 
 const router = new Router()
 
-router.get('/', middleware.logRequest('health', health.getHealth.name), health.getHealth)
+router.get('/source', middleware.logRequest('features', features.source.name), features.source)
 
 module.exports = router

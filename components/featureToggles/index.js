@@ -1,88 +1,86 @@
 'use strict'
 
-let _isAuthToggled = true
-let _isDescriptionToggled = true
-let _isFindingToggled = true
-let _isRelationshipToggled = true
+import fs from 'fs'
+import config from '../../config/environment'
+import { FeatureFileError, FeatureFileMissingError, InvalidFeatureNameError } from '../../components/errors'
 
-export function toggleAuthFeature (value) {
-  if (typeof value === 'boolean') _isAuthToggled = value
-}
+let features = {}
 
-export function isAuthToggled () {
-  return _isAuthToggled
-}
+const FEATURES = ['auth', 'description', 'finding', 'relationship']
+const FEATURES_PATH = `${config.dataPath}/features.toggles`
 
-export function toggleDescriptionFeature (value) {
-  if (typeof value === 'boolean') _isDescriptionToggled = value
-}
+export function isFeatureToggled (featureName) {
+  if (!FEATURES.includes(featureName)) {
+    throw new InvalidFeatureNameError({
+      featureName: featureName,
+      message: `${featureName}.invalidName`
+    })
+  }
 
-export function isDescriptionToggled () {
-  return _isDescriptionToggled
-}
-
-export function toggleFindingFeature (value) {
-  if (typeof value === 'boolean') _isFindingToggled = value
-}
-
-export function isFindingToggled () {
-  return _isFindingToggled
-}
-
-export function toggleRelationshipFeature (value) {
-  if (typeof value === 'boolean') _isRelationshipToggled = value
-}
-
-export function isRelationshipToggled () {
-  return _isRelationshipToggled
+  return features[featureName]
 }
 
 export function getFeatureStatus (featureName) {
+  const out = {}
+
   if (featureName != null) {
-    switch (featureName) {
-      case 'auth':
-        return {auth: isAuthToggled() ? 'UP' : 'DOWN'}
+    if (FEATURES.includes(featureName)) {
+      out[featureName] = features[featureName] ? 'UP' : 'DOWN'
 
-      case 'description':
-        return {description: isAuthToggled() ? 'UP' : 'DOWN'}
+      return out
+    }
 
-      case 'finding':
-        return {finding: isAuthToggled() ? 'UP' : 'DOWN'}
+    throw new InvalidFeatureNameError({
+      featureName: featureName,
+      message: `${featureName}.invalidName`
+    })
+  }
 
-      case 'relationship':
-        return {relationship: isAuthToggled() ? 'UP' : 'DOWN'}
+  for (let featureName of FEATURES) {
+    out[featureName] = features[featureName] ? 'UP' : 'DOWN'
+  }
 
-      default:
-        return {error: `${featureName} is not a valid feature name.`}
+  return out
+}
+
+export function createFeaturesFile () {
+  function createFile () {
+    for (let feature of FEATURES) {
+      features[feature] = true
+    }
+
+    return fs.writeFileSync(FEATURES_PATH, JSON.stringify(features))
+  }
+
+  if (fs.existsSync(FEATURES_PATH)) {
+    const data = fs.readFileSync(FEATURES_PATH)
+    let _features
+
+    try {
+      _features = JSON.parse(data)
+    } catch (error) {
+      fs.unlinkSync(FEATURES_PATH)
+
+      return createFile()
+    }
+
+    for (let feature of FEATURES) {
+      if (_features[feature] == null) return createFile()
     }
   }
 
-  return {
-    auth: isAuthToggled() ? 'UP' : 'DOWN',
-    finding: isFindingToggled() ? 'UP' : 'DOWN',
-    description: isDescriptionToggled() ? 'UP' : 'DOWN',
-    relationship: isRelationshipToggled() ? 'UP' : 'DOWN'
-  }
+  createFile()
 }
 
-export function toggleFeature (featureName, value) {
-  if (featureName == null || value == null) return {error: 'featureName and value are required.'}
-  if (typeof value !== 'boolean') return {error: `${value} is not a valid value.`}
+export function sourceFile () {
+  return new Promise((resolve, reject) => {
+    if (!fs.existsSync(FEATURES_PATH)) return reject(new FeatureFileMissingError('featureFile.notFound'))
 
-  switch (featureName) {
-    case 'auth':
-      return toggleAuthFeature(value)
+    return fs.readFile(FEATURES_PATH, (error, data) => error != null ? reject(new FeatureFileError('featureFile.error')) : resolve(data))
+  })
+    .then(data => {
+      features = JSON.parse(data)
 
-    case 'description':
-      return toggleDescriptionFeature(value)
-
-    case 'finding':
-      return toggleFindingFeature(value)
-
-    case 'relationship':
-      return toggleRelationshipFeature(value)
-
-    default:
-      return {error: `${featureName} is not a valid feature name.`}
-  }
+      return getFeatureStatus()
+    })
 }

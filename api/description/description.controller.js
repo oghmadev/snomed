@@ -2,13 +2,19 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError } from '../../components/errors'
+import { APIParamMissingError, FeatureUnavailableError } from '../../components/errors'
 import constants from '../../components/constants'
+import { isFeatureToggled } from '../../components/featureToggles'
 
 export function getFSN (req, res) {
-  return Promise.resolve(utils.checkToggle('Description'))
-    .then(toggleError => {
-      if (toggleError != null) throw toggleError
+  return Promise.resolve(isFeatureToggled('description'))
+    .then(isToggled => {
+      if (!isToggled) {
+        throw new FeatureUnavailableError({
+          feature: 'description',
+          message: 'description.feature.inactive'
+        })
+      }
 
       if (req.params.id == null) {
         throw new APIParamMissingError({
@@ -33,9 +39,15 @@ export function getFSN (req, res) {
 }
 
 export function getSynonyms (req, res) {
-  return Promise.resolve(utils.checkToggle('Description'))
-    .then(toggleError => {
-      if (toggleError != null) throw toggleError
+  return Promise.resolve(isFeatureToggled('description'))
+    .then(isToggled => {
+      if (!isToggled) {
+        throw new FeatureUnavailableError({
+          feature: 'description',
+          message: 'description.feature.inactive'
+        })
+      }
+
       if (req.params.id == null) {
         throw new APIParamMissingError({
           missingParams: ['id'],

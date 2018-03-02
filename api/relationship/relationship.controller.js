@@ -2,12 +2,18 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError } from '../../components/errors'
+import { APIParamMissingError,FeatureUnavailableError } from '../../components/errors'
+import { isFeatureToggled } from '../../components/featureToggles'
 
 export function getParents (req, res) {
-  return Promise.resolve(utils.checkToggle('Relationship'))
-    .then(toggleError => {
-      if (toggleError != null) throw toggleError
+  return Promise.resolve(isFeatureToggled('relationship'))
+    .then(isToggled => {
+      if (!isToggled) {
+        throw new FeatureUnavailableError({
+          feature: 'relationship',
+          message: 'relationship.feature.inactive'
+        })
+      }
 
       const missingParams = []
 
@@ -40,9 +46,14 @@ export function getParents (req, res) {
 }
 
 export function getChildren (req, res) {
-  return Promise.resolve(utils.checkToggle('Relationship'))
-    .then(toggleError => {
-      if (toggleError != null) throw toggleError
+  return Promise.resolve(isFeatureToggled('relationship'))
+    .then(isToggled => {
+      if (!isToggled) {
+        throw new FeatureUnavailableError({
+          feature: 'relationship',
+          message: 'relationship.feature.inactive'
+        })
+      }
 
       const missingParams = []
 

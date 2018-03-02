@@ -12,18 +12,6 @@ class BaseError extends Error {
   }
 }
 
-class EntityError extends BaseError {
-  constructor (parent) {
-    super(parent)
-
-    this.entity = parent.entity
-    this.name = 'SnomedEntityError'
-    this.statusCode = 500
-
-    Error.captureStackTrace(this, this.constructor)
-  }
-}
-
 class APIError extends BaseError {
   constructor (parent) {
     super(parent)
@@ -99,14 +87,48 @@ class FeatureUnavailableError extends BaseError {
   }
 }
 
+class FeatureFileError extends BaseError {
+  constructor (parent) {
+    super(parent)
+
+    this.name = 'SnomedFeatureFileError'
+
+    Error.captureStackTrace(this, this.constructor)
+  }
+}
+
+class FeatureFileMissingError extends FeatureFileError {
+  constructor (parent) {
+    super(parent)
+
+    this.name = 'SnomedFeatureFileMissingError'
+    this.statusCode = 404
+
+    Error.captureStackTrace(this, this.constructor)
+  }
+}
+
+class InvalidFeatureNameError extends FeatureFileError {
+  constructor (parent) {
+    super(parent)
+
+    this.name = 'SnomedInvalidFeatureNameError'
+    this.featureName = parent.featureName
+
+    Error.captureStackTrace(this, this.constructor)
+  }
+}
+
 module.exports = {
   BaseError,
   APIError,
   APIParamMissingError,
   APIParamInvalidError,
-  EntityError,
   AuthenticationError,
   UserNotFoundError,
   UserInactiveError,
-  FeatureUnavailableError
+  FeatureUnavailableError,
+  FeatureFileError,
+  FeatureFileMissingError,
+  InvalidFeatureNameError
 }
