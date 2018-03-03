@@ -6,7 +6,7 @@ import { FeatureFileError, FeatureFileMissingError, InvalidFeatureNameError } fr
 
 let features = {}
 
-const FEATURES = ['auth', 'description', 'finding', 'relationship']
+const FEATURES = ['auth', 'description', 'disorder', 'finding', 'procedure', 'relationship']
 const FEATURES_PATH = `${config.dataPath}/features.toggles`
 
 export function isFeatureToggled (featureName) {

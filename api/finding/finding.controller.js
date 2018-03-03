@@ -22,7 +22,7 @@ export function getFindingsByCriteria (req, res) {
           endpoint: req.originalUrl,
           method: req.method,
           controllerFunction: getFindingsByCriteria.name,
-          message: 'findings.criteria.missing'
+          message: 'finding.criteria.missing'
         })
       }
 
@@ -32,10 +32,10 @@ export function getFindingsByCriteria (req, res) {
 
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                     WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.FINDING} AND 
+                     WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.FINDING.id} AND 
                            description.active = TRUE AND "transitiveClosure"."subtypeId" = description."conceptId" AND 
                            unaccent(description."term") ILIKE '%${criteria}%' AND 
-                           description."typeId" <> ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
+                           description."typeId" <> ${constants.SNOMED.TYPES.DESCRIPTION.FSN.id}
                      LIMIT 10
                      OFFSET 0;`
 
