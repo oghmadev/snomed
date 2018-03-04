@@ -86,7 +86,7 @@ export function getDirectParents (req, res) {
 
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Relationship" relationship, "Description" description
-                     WHERE relationship."destinationId" = ${req.query.conceptId} AND description.active = TRUE AND
+                     WHERE relationship."destinationId" = ${req.params.id} AND description.active = TRUE AND
                      relationship."sourceId" = description."conceptId" AND
                      relationship."typeId" = ${constants.SNOMED.TYPES.RELATIONSHIP.IS_A}
                      OFFSET ${req.query.skip}
@@ -114,7 +114,7 @@ export function getDirectChildren (req, res) {
 
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Relationship" relationship, "Description" description
-                     WHERE relationship."sourceId" = ${req.query.conceptId} AND description.active = TRUE AND
+                     WHERE relationship."sourceId" = ${req.params.id} AND description.active = TRUE AND
                      relationship."destinationId" = description."conceptId" AND
                      relationship."sourceId" = ${constants.SNOMED.TYPES.RELATIONSHIP.IS_A}
                      OFFSET ${req.query.skip}
