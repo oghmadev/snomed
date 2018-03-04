@@ -2,20 +2,12 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError, FeatureUnavailableError } from '../../components/errors'
+import { APIParamMissingError } from '../../components/errors'
 import constants from '../../components/constants'
-import { isFeatureToggled } from '../../components/featureToggles'
 
 export function getFindingsByCriteria (req, res) {
-  return Promise.resolve(isFeatureToggled('finding'))
-    .then(isToggled => {
-      if (!isToggled) {
-        throw new FeatureUnavailableError({
-          feature: 'finding',
-          message: 'finding.feature.inactive'
-        })
-      }
-
+  return utils.checkToggle('finding')
+    .then(() => {
       if (req.query.criteria == null) {
         throw new APIParamMissingError({
           missingParams: ['criteria'],
@@ -32,10 +24,10 @@ export function getFindingsByCriteria (req, res) {
 
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                     WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.FINDING.id} AND 
+                     WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.FINDING} AND 
                            description.active = TRUE AND "transitiveClosure"."subtypeId" = description."conceptId" AND 
                            unaccent(description."term") ILIKE '%${criteria}%' AND 
-                           description."typeId" <> ${constants.SNOMED.TYPES.DESCRIPTION.FSN.id}
+                           description."typeId" <> ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
                      LIMIT 10
                      OFFSET 0;`
 

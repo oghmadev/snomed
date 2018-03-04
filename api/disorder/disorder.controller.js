@@ -2,20 +2,12 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError, FeatureUnavailableError } from '../../components/errors'
+import { APIParamMissingError } from '../../components/errors'
 import constants from '../../components/constants'
-import { isFeatureToggled } from '../../components/featureToggles'
 
 export function getDisorderByCriteria (req, res) {
-  return Promise.resolve(isFeatureToggled('disorder'))
-    .then(isToggled => {
-      if (!isToggled) {
-        throw new FeatureUnavailableError({
-          feature: 'disorder',
-          message: 'disorder.feature.inactive'
-        })
-      }
-
+  return utils.checkToggle('disorder')
+    .then(() => {
       if (req.query.criteria == null) {
         throw new APIParamMissingError({
           missingParams: ['criteria'],
@@ -32,11 +24,11 @@ export function getDisorderByCriteria (req, res) {
 
       const query = `WITH FSN AS (SELECT description."conceptId"
                                   FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                                  WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.FINDING.DISORDER.id} AND 
+                                  WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.DISORDER} AND 
                                         description.active = TRUE AND
                                         "transitiveClosure"."subtypeId" = description."conceptId" AND 
                                         unaccent(description."term") ILIKE '%${criteria}%' AND 
-                                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN.id}
+                                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
                                   LIMIT 10
                                   OFFSET 0)
                      SELECT description.id, description."conceptId", description.term, description."typeId"
@@ -46,13 +38,12 @@ export function getDisorderByCriteria (req, res) {
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })
     .then(disorders => {
-      const out = disorders.filter(d => d.typeId === constants.SNOMED.TYPES.DESCRIPTION.FSN.id)
+      return disorders.filter(d => d.typeId === constants.SNOMED.TYPES.DESCRIPTION.FSN)
+        .map(disorder => {
+          disorder.synonyms = disorders.filter(d => d.typeId === constants.SNOMED.TYPES.DESCRIPTION.SYNONYM && d.conceptId === disorder.conceptId)
 
-      return out.map(disorder => {
-        disorder.synonyms = disorders.filter(d => d.typeId === constants.SNOMED.TYPES.DESCRIPTION.SYNONYM.id && d.conceptId === disorder.conceptId)
-
-        return disorder
-      })
+          return disorder
+        })
     })
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))

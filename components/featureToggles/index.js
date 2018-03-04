@@ -64,9 +64,7 @@ export function createFeaturesFile () {
       return createFile()
     }
 
-    for (let feature of FEATURES) {
-      if (_features[feature] == null) return createFile()
-    }
+    if (FEATURES.some(feature => _features[feature] == null)) return createFile()
   }
 
   createFile()

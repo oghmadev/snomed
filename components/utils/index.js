@@ -1,6 +1,8 @@
 'use strict'
 
 import errorHandler from '../errorHandler'
+import { isFeatureToggled } from '../featureToggles'
+import { FeatureUnavailableError } from '../errors'
 
 export function respondWithResult (res, statusCode) {
   statusCode = statusCode || 200
@@ -97,5 +99,16 @@ export function resolveCallback (resolve, reject) {
     if (err != null) return reject(err)
 
     return resolve(data)
+  }
+}
+
+export function checkToggle (featureName) {
+  if (!isFeatureToggled(featureName)) {
+    return Promise.reject(new FeatureUnavailableError({
+      feature: featureName,
+      message: `${featureName}.feature.inactive`
+    }))
+  } else {
+    return Promise.resolve(null)
   }
 }

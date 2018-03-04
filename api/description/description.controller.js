@@ -2,20 +2,12 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError, FeatureUnavailableError } from '../../components/errors'
+import { APIParamMissingError } from '../../components/errors'
 import constants from '../../components/constants'
-import { isFeatureToggled } from '../../components/featureToggles'
 
 export function getFSN (req, res) {
-  return Promise.resolve(isFeatureToggled('description'))
-    .then(isToggled => {
-      if (!isToggled) {
-        throw new FeatureUnavailableError({
-          feature: 'description',
-          message: 'description.feature.inactive'
-        })
-      }
-
+  return utils.checkToggle('description')
+    .then(() => {
       if (req.params.id == null) {
         throw new APIParamMissingError({
           missingParams: ['id'],
@@ -29,7 +21,7 @@ export function getFSN (req, res) {
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Description" description
                      WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE AND
-                     description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN.id}`
+                     description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}`
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })
@@ -39,15 +31,8 @@ export function getFSN (req, res) {
 }
 
 export function getSynonyms (req, res) {
-  return Promise.resolve(isFeatureToggled('description'))
-    .then(isToggled => {
-      if (!isToggled) {
-        throw new FeatureUnavailableError({
-          feature: 'description',
-          message: 'description.feature.inactive'
-        })
-      }
-
+  return utils.checkToggle('description')
+    .then(() => {
       if (req.params.id == null) {
         throw new APIParamMissingError({
           missingParams: ['id'],
@@ -61,7 +46,7 @@ export function getSynonyms (req, res) {
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Description" description
                      WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE AND
-                     description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM.id}`
+                     description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}`
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })

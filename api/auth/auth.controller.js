@@ -3,20 +3,12 @@
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
 import * as utils from '../../components/utils'
-import { AuthenticationError, UserInactiveError, UserNotFoundError, FeatureUnavailableError } from '../../components/errors'
+import { AuthenticationError, UserInactiveError, UserNotFoundError } from '../../components/errors'
 import config from '../../config/environment'
-import { isFeatureToggled } from '../../components/featureToggles'
 
 export function authenticate (req, res) {
-  return Promise.resolve(isFeatureToggled('auth'))
-    .then(isToggled => {
-      if (!isToggled) {
-        throw new FeatureUnavailableError({
-          feature: 'auth',
-          message: 'auth.feature.inactive'
-        })
-      }
-
+  return utils.checkToggle('auth')
+    .then(() => {
       return new Promise((resolve, reject) => {
         return passport.authenticate('local', (error, user) => {
           if (error != null) return reject(new AuthenticationError({message: error.message}))

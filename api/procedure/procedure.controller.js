@@ -2,20 +2,12 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError, FeatureUnavailableError } from '../../components/errors'
+import { APIParamMissingError } from '../../components/errors'
 import constants from '../../components/constants'
-import { isFeatureToggled } from '../../components/featureToggles'
 
 export function getProcedureByCriteria (req, res) {
-  return Promise.resolve(isFeatureToggled('procedure'))
-    .then(isToggled => {
-      if (!isToggled) {
-        throw new FeatureUnavailableError({
-          feature: 'procedure',
-          message: 'procedure.feature.inactive'
-        })
-      }
-
+  return utils.checkToggle('procedure')
+    .then(() => {
       if (req.query.criteria == null) {
         throw new APIParamMissingError({
           missingParams: ['criteria'],
@@ -32,11 +24,11 @@ export function getProcedureByCriteria (req, res) {
 
       const query = `WITH FSN AS (SELECT description."conceptId"
                                   FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                                  WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE.id} AND 
+                                  WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE} AND 
                                         description.active = TRUE AND
                                         "transitiveClosure"."subtypeId" = description."conceptId" AND 
                                         unaccent(description."term") ILIKE '%${criteria}%' AND 
-                                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN.id}
+                                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
                                   LIMIT 10
                                   OFFSET 0)
                      SELECT description.id, description."conceptId", description.term, description."typeId"
@@ -46,13 +38,12 @@ export function getProcedureByCriteria (req, res) {
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })
     .then(procedures => {
-      const out = procedures.filter(p => p.typeId === constants.SNOMED.TYPES.DESCRIPTION.FSN.id)
+      return procedures.filter(p => p.typeId === constants.SNOMED.TYPES.DESCRIPTION.FSN)
+        .map(procedure => {
+          procedure.synonyms = procedures.filter(p => p.typeId === constants.SNOMED.TYPES.DESCRIPTION.SYNONYM && p.conceptId === procedure.conceptId)
 
-      return out.map(procedure => {
-        procedure.synonyms = procedures.filter(p => p.typeId === constants.SNOMED.TYPES.DESCRIPTION.SYNONYM.id && p.conceptId === procedure.conceptId)
-
-        return procedure
-      })
+          return procedure
+        })
     })
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))

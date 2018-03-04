@@ -12,8 +12,7 @@ export default function (sequelize, DataTypes) {
     },
     username: {
       type: DataTypes.STRING,
-      unique: {msg: 'user.username.notUnique'},
-      validate: {isEmail: true}
+      unique: {msg: 'user.username.notUnique'}
     },
     password: {
       type: DataTypes.STRING,
@@ -59,24 +58,12 @@ function updatePassword (user, sequelize) {
 
       return encryptPassword(user.password, salt)
     })
-    .then(hashedPassword => {
-      user.password = hashedPassword
-    })
-    .catch(err => {
-      return sequelize.Promise.reject(err)
-    })
+    .then(hashedPassword => (user.password = hashedPassword))
+    .catch(err => sequelize.Promise.reject(err))
 }
 
 function makeSalt () {
-  const BYTE_SIZE = 16
-
-  return new Promise((resolve, reject) => {
-    return crypto.randomBytes(BYTE_SIZE, (err, salt) => {
-      if (err != null) return reject(err)
-
-      return resolve(salt.toString('base64'))
-    })
-  })
+  return new Promise((resolve, reject) => crypto.randomBytes(16, (err, salt) => err != null ? reject(err) : resolve(salt.toString('base64'))))
 }
 
 function encryptPassword (password, salt) {
@@ -85,11 +72,5 @@ function encryptPassword (password, salt) {
   const DIGEST = 'sha1'
   const SALT = Buffer.from(salt, 'base64')
 
-  return new Promise((resolve, reject) => {
-    return crypto.pbkdf2(password, SALT, DEFAULT_ITERATIONS, DEFAULT_KEY_LENGTH, DIGEST, (err, key) => {
-      if (err != null) return reject(err)
-
-      return resolve(key.toString('base64'))
-    })
-  })
+  return new Promise((resolve, reject) => crypto.pbkdf2(password, SALT, DEFAULT_ITERATIONS, DEFAULT_KEY_LENGTH, DIGEST, (err, key) => err != null ? reject(err) : resolve(key.toString('base64'))))
 }
