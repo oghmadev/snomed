@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+function set_env {
+  export USER_ID=$(id -u)
+  export GROUP_ID=$(id -g)
+}
+
 function check_network {
   echo "Checking if network backend exists..."
   local BACKEND_NETWORK_ID=$(docker network ls -f name=backend -q)
@@ -13,10 +18,11 @@ function check_network {
 }
 
 function update {
+  set_env
   echo "Building docker image..."
   docker-compose build
   echo "Updating node dependencies..."
-  docker run --rm -v "${PWD}:/usr/app/snomed" snomed_app npm install
+  docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${PWD}:/usr/app/snomed" snomed_app npm install
 }
 
 function print_usage {
@@ -36,8 +42,8 @@ while getopts "iusdh" OPT; do
   case "$OPT" in
     i) check_network; update;;
     u) update;;
-    s) docker-compose up;;
-    d) docker-compose down;;
+    s) set_env; docker-compose up;;
+    d) set_env; docker-compose down;;
     h) print_usage; exit 0;;
   esac
 done
