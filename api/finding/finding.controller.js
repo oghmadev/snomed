@@ -2,27 +2,19 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError, FeatureUnavailableError } from '../../components/errors'
+import { APIParamMissingError } from '../../components/errors'
 import constants from '../../components/constants'
-import { isFeatureToggled } from '../../components/featureToggles'
 
 export function getFindingsByCriteria (req, res) {
-  return Promise.resolve(isFeatureToggled('finding'))
-    .then(isToggled => {
-      if (!isToggled) {
-        throw new FeatureUnavailableError({
-          feature: 'finding',
-          message: 'finding.feature.inactive'
-        })
-      }
-
+  return utils.checkToggle('finding')
+    .then(() => {
       if (req.query.criteria == null) {
         throw new APIParamMissingError({
           missingParams: ['criteria'],
           endpoint: req.originalUrl,
           method: req.method,
           controllerFunction: getFindingsByCriteria.name,
-          message: 'findings.criteria.missing'
+          message: 'finding.criteria.missing'
         })
       }
 

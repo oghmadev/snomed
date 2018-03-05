@@ -3,9 +3,7 @@
 export default {
   SNOMED: {
     TYPES: {
-      RELATIONSHIP: {
-        IS_A: '116680003'
-      },
+      RELATIONSHIP: {IS_A: '116680003'},
       DESCRIPTION: {
         FSN: '900000000000003001',
         SYNONYM: '900000000000013009',
@@ -13,7 +11,9 @@ export default {
       }
     },
     HIERARCHY: {
+      ALLERGY: '609328004',
       BODY_STRUCTURE: '123037004',
+      DISORDER: '64572001',
       FINDING: '404684003',
       ENVIRONMENT_LOCATION: '308916002',
       EVENT: '272379006',
@@ -28,8 +28,7 @@ export default {
       SOCIAL_CONTEXT: '48176007',
       SPECIMEN: '123038009',
       STAGING: '254291000',
-      SUBSTANCE: '105590001',
-      DISORDER: '64572001'
+      SUBSTANCE: '105590001'
     }
   }
 }

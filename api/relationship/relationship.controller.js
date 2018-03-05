@@ -2,19 +2,12 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError,FeatureUnavailableError } from '../../components/errors'
-import { isFeatureToggled } from '../../components/featureToggles'
+import { APIParamMissingError } from '../../components/errors'
+import constants from '../../components/constants'
 
 export function getParents (req, res) {
-  return Promise.resolve(isFeatureToggled('relationship'))
-    .then(isToggled => {
-      if (!isToggled) {
-        throw new FeatureUnavailableError({
-          feature: 'relationship',
-          message: 'relationship.feature.inactive'
-        })
-      }
-
+  return utils.checkToggle('relationship')
+    .then(() => {
       const missingParams = []
 
       if (req.query.skip == null) missingParams.push('skip')
@@ -46,15 +39,8 @@ export function getParents (req, res) {
 }
 
 export function getChildren (req, res) {
-  return Promise.resolve(isFeatureToggled('relationship'))
-    .then(isToggled => {
-      if (!isToggled) {
-        throw new FeatureUnavailableError({
-          feature: 'relationship',
-          message: 'relationship.feature.inactive'
-        })
-      }
-
+  return utils.checkToggle('relationship')
+    .then(() => {
       const missingParams = []
 
       if (req.query.skip == null) missingParams.push('skip')
@@ -75,6 +61,62 @@ export function getChildren (req, res) {
                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
                      WHERE "transitiveClosure"."supertypeId" = ${req.query.conceptId} AND description.active = TRUE AND
                      "transitiveClosure"."subtypeId" = description."conceptId"
+                     OFFSET ${req.query.skip}
+                     LIMIT ${req.query.limit};`
+
+      return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
+    })
+    .then(utils.handleEntityNotFound(res))
+    .then(utils.respondWithResult(res))
+    .catch(utils.handleError(res, req.requestId))
+}
+
+export function getDirectParents (req, res) {
+  return utils.checkToggle('relationship')
+    .then(() => {
+      if (req.params.id == null) {
+        throw new APIParamMissingError({
+          missingParams: ['id'],
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getDirectParents.name,
+          message: 'relationship.id.missing'
+        })
+      }
+
+      const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
+                     FROM "Relationship" relationship, "Description" description
+                     WHERE relationship."destinationId" = ${req.params.id} AND description.active = TRUE AND
+                     relationship."sourceId" = description."conceptId" AND
+                     relationship."typeId" = ${constants.SNOMED.TYPES.RELATIONSHIP.IS_A}
+                     OFFSET ${req.query.skip}
+                     LIMIT ${req.query.limit};`
+
+      return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
+    })
+    .then(utils.handleEntityNotFound(res))
+    .then(utils.respondWithResult(res))
+    .catch(utils.handleError(res, req.requestId))
+}
+
+export function getDirectChildren (req, res) {
+  return utils.checkToggle('relationship')
+    .then(() => {
+      if (req.params.id == null) {
+        throw new APIParamMissingError({
+          missingParams: ['id'],
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getDirectChildren.name,
+          message: 'relationship.id.missing'
+        })
+      }
+
+      const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
+                     FROM "Relationship" relationship, "Description" description
+                     WHERE relationship."sourceId" = ${req.params.id} AND description.active = TRUE AND
+                     relationship."destinationId" = description."conceptId" AND
+                     relationship."sourceId" = ${constants.SNOMED.TYPES.RELATIONSHIP.IS_A}
                      OFFSET ${req.query.skip}
                      LIMIT ${req.query.limit};`
 
