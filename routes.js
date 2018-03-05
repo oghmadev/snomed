@@ -6,6 +6,14 @@ import { getFeatureNames } from './components/featureToggles'
 export default function (app) {
   const API_PATH = `/api/v${version}`
 
+  if (process.env.NODE_ENV === 'development') {
+    app.use((req, res, next) => {
+      res.header('Access-Control-Allow-Origin', 'http://localhost:3000')
+      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, X-Request-ID')
+      next()
+    })
+  }
+
   for (let feature of getFeatureNames()) {
     app.use(`${API_PATH}/${feature}`, require(`./api/${feature}`))
   }
@@ -13,7 +21,6 @@ export default function (app) {
   app.use(`${API_PATH}/features`, require('./api/features'))
   app.use(`${API_PATH}/health`, require('./api/health'))
 
-  // All other routes should return a 404
   app.route('/*')
     .get(pageNotFound)
 }

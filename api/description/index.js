@@ -8,5 +8,6 @@ const router = new Router()
 
 router.get('/fsn/:id', middleware.logRequest('description', description.getFSN.name), description.getFSN)
 router.get('/synonym/:id', middleware.logRequest('description', description.getSynonyms.name), description.getSynonyms)
+router.get('/:id', middleware.logRequest('description', description.getDescription.name), description.getDescription)
 
 module.exports = router
