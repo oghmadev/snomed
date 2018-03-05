@@ -1,18 +1,17 @@
 'use strict'
 
 import { version } from './package'
+import { getFeatureNames } from './components/featureToggles'
 
 export default function (app) {
   const API_PATH = `/api/v${version}`
 
-  app.use(`${API_PATH}/auth`, require('./api/auth'))
-  app.use(`${API_PATH}/description`, require('./api/description'))
-  app.use(`${API_PATH}/disorder`, require('./api/disorder'))
+  for (let feature of getFeatureNames()) {
+    app.use(`${API_PATH}/${feature}`, require(`./api/${feature}`))
+  }
+
   app.use(`${API_PATH}/features`, require('./api/features'))
-  app.use(`${API_PATH}/finding`, require('./api/finding'))
   app.use(`${API_PATH}/health`, require('./api/health'))
-  app.use(`${API_PATH}/procedure`, require('./api/procedure'))
-  app.use(`${API_PATH}/relationship`, require('./api/relationship'))
 
   // All other routes should return a 404
   app.route('/*')

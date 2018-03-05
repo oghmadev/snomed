@@ -9,8 +9,12 @@ let features = {}
 const FEATURES = ['auth', 'description', 'disorder', 'finding', 'procedure', 'relationship']
 const FEATURES_PATH = `${config.dataPath}/features.toggles`
 
+export function getFeatureNames () {
+  return FEATURES
+}
+
 export function isFeatureToggled (featureName) {
-  if (!FEATURES.includes(featureName)) {
+  if (!features.hasOwnProperty(featureName)) {
     throw new InvalidFeatureNameError({
       featureName: featureName,
       message: `${featureName}.invalidName`
@@ -24,7 +28,7 @@ export function getFeatureStatus (featureName) {
   const out = {}
 
   if (featureName != null) {
-    if (FEATURES.includes(featureName)) {
+    if (features.hasOwnProperty(featureName)) {
       out[featureName] = features[featureName] ? 'UP' : 'DOWN'
 
       return out
