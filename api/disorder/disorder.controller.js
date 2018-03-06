@@ -2,7 +2,7 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError } from '../../components/errors'
+import { APIParamInvalidError, APIParamMissingError } from '../../components/errors'
 import constants from '../../components/constants'
 
 export function countDisorderByCriteria (req, res) {
@@ -41,13 +41,34 @@ export function countDisorderByCriteria (req, res) {
 export function getDisorderByCriteria (req, res) {
   return utils.checkToggle('disorder')
     .then(() => {
-      if (req.query.criteria == null) {
+      const missingParams = []
+
+      if (req.query.skip == null) missingParams.push('skip')
+      if (req.query.limit == null) missingParams.push('limit')
+      if (req.query.criteria == null) missingParams.push('criteria')
+
+      if (missingParams.length > 0) {
         throw new APIParamMissingError({
-          missingParams: ['criteria'],
+          missingParams: missingParams,
           endpoint: req.originalUrl,
           method: req.method,
           controllerFunction: getDisorderByCriteria.name,
-          message: 'disorder.criteria.missing'
+          message: 'disorder.params.missing'
+        })
+      }
+
+      const invalidParams = []
+
+      if (isNaN(req.query.skip)) invalidParams.push('skip')
+      if (isNaN(req.query.limit)) invalidParams.push('limit')
+
+      if (invalidParams.length > 0) {
+        throw new APIParamInvalidError({
+          invalidParams: invalidParams,
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getDisorderByCriteria.name,
+          message: 'disorder.params.invalid'
         })
       }
 
@@ -63,8 +84,8 @@ export function getDisorderByCriteria (req, res) {
                                         unaccent(description."term") ILIKE '%${criteria}%' AND 
                                         description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
                                   ORDER BY description.term ASC
-                                  LIMIT 10
-                                  OFFSET 0)
+                                  LIMIT ${req.query.limit}
+                                  OFFSET ${req.query.skip})
                      SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Description" description, FSN
                      WHERE description."conceptId" = FSN."conceptId";`

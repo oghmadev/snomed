@@ -2,7 +2,7 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError } from '../../components/errors'
+import { APIParamInvalidError, APIParamMissingError } from '../../components/errors'
 import constants from '../../components/constants'
 
 export function getParents (req, res) {
@@ -21,6 +21,21 @@ export function getParents (req, res) {
           method: req.method,
           controllerFunction: getParents.name,
           message: 'relationship.params.missing'
+        })
+      }
+
+      const invalidParams = []
+
+      if (isNaN(req.query.skip)) invalidParams.push('skip')
+      if (isNaN(req.query.limit)) invalidParams.push('limit')
+
+      if (invalidParams.length > 0) {
+        throw new APIParamInvalidError({
+          invalidParams: invalidParams,
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getParents.name,
+          message: 'relationship.params.invalid'
         })
       }
 
@@ -54,6 +69,21 @@ export function getChildren (req, res) {
           method: req.method,
           controllerFunction: getChildren.name,
           message: 'relationship.params.missing'
+        })
+      }
+
+      const invalidParams = []
+
+      if (isNaN(req.query.skip)) invalidParams.push('skip')
+      if (isNaN(req.query.limit)) invalidParams.push('limit')
+
+      if (invalidParams.length > 0) {
+        throw new APIParamInvalidError({
+          invalidParams: invalidParams,
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getChildren.name,
+          message: 'relationship.params.invalid'
         })
       }
 

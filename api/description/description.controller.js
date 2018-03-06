@@ -57,6 +57,39 @@ export function getSynonyms (req, res) {
     .catch(utils.handleError(res, req.requestId))
 }
 
+export function getComplete (req, res) {
+  return utils.checkToggle('description')
+    .then(() => {
+      if (req.params.id == null) {
+        throw new APIParamMissingError({
+          missingParams: ['id'],
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getComplete.name,
+          message: 'description.conceptId.missing'
+        })
+      }
+
+      const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
+                     FROM "Description" description
+                     WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE
+                     ORDER BY description.term ASC;`
+
+      return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
+    })
+    .then(concepts => {
+      return concepts.filter(c => c.typeId === constants.SNOMED.TYPES.DESCRIPTION.FSN)
+        .map(concept => {
+          concept.synonyms = concepts.filter(c => c.typeId === constants.SNOMED.TYPES.DESCRIPTION.SYNONYM && c.conceptId === concept.conceptId)
+
+          return concept
+        })[0]
+    })
+    .then(utils.handleEntityNotFound(res))
+    .then(utils.respondWithResult(res))
+    .catch(utils.handleError(res, req.requestId))
+}
+
 export function getDescription (req, res) {
   return utils.checkToggle('description')
     .then(() => {

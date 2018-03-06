@@ -2,8 +2,9 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError } from '../../components/errors'
+import { APIParamMissingError, APIParamInvalidError } from '../../components/errors'
 import constants from '../../components/constants'
+import { getDisorderByCriteria } from '../disorder/disorder.controller'
 
 export function countProcedureByCriteria (req, res) {
   return utils.checkToggle('procedure')
@@ -40,13 +41,34 @@ export function countProcedureByCriteria (req, res) {
 export function getProcedureByCriteria (req, res) {
   return utils.checkToggle('procedure')
     .then(() => {
-      if (req.query.criteria == null) {
+      const missingParams = []
+
+      if (req.query.skip == null) missingParams.push('skip')
+      if (req.query.limit == null) missingParams.push('limit')
+      if (req.query.criteria == null) missingParams.push('criteria')
+
+      if (missingParams.length > 0) {
         throw new APIParamMissingError({
           missingParams: ['criteria'],
           endpoint: req.originalUrl,
           method: req.method,
           controllerFunction: getProcedureByCriteria.name,
           message: 'procedure.criteria.missing'
+        })
+      }
+
+      const invalidParams = []
+
+      if (isNaN(req.query.skip)) invalidParams.push('skip')
+      if (isNaN(req.query.limit)) invalidParams.push('limit')
+
+      if (invalidParams.length > 0) {
+        throw new APIParamInvalidError({
+          invalidParams: invalidParams,
+          endpoint: req.originalUrl,
+          method: req.method,
+          controllerFunction: getProcedureByCriteria.name,
+          message: 'procedure.params.invalid'
         })
       }
 
@@ -61,8 +83,8 @@ export function getProcedureByCriteria (req, res) {
                                         "transitiveClosure"."subtypeId" = description."conceptId" AND 
                                         unaccent(description."term") ILIKE '%${criteria}%' AND 
                                         description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
-                                  LIMIT 10
-                                  OFFSET 0)
+                                  LIMIT ${req.query.limit}
+                                  OFFSET ${req.query.skip})
                      SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Description" description, FSN
                      WHERE description."conceptId" = FSN."conceptId";`
