@@ -2,7 +2,7 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamMissingError, APIParamInvalidError } from '../../components/errors'
+import { APIParamInvalidError, APIParamMissingError } from '../../components/errors'
 import constants from '../../components/constants'
 
 export function countProcedureByCriteria (req, res) {
@@ -105,7 +105,7 @@ export function getProcedureByCriteria (req, res) {
 }
 
 export function getProcedureSynonymByCriteria (req, res) {
-  return utils.checkToggle('disorder')
+  return utils.checkToggle('procedure')
     .then(() => {
       if (req.query.criteria == null) {
         throw new APIParamMissingError({
