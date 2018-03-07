@@ -9,8 +9,8 @@ def init_snomed():
 
     with get_connection(**db_config) as connection:
         with connection.cursor() as cursor:
-            cursor.execute(open(get_data_file_path('sql/indexes.sql'), 'r').read())
             cursor.execute(open(get_data_file_path('sql/extensions.sql'), 'r').read())
+            cursor.execute(open(get_data_file_path('sql/indexes.sql'), 'r').read())
 
             for f in iglob(get_data_file_path('sct2_Concept*.txt')):
                 with open(f, 'r') as data_file:
@@ -26,26 +26,6 @@ def init_snomed():
                 with open(f, 'r') as data_file:
                    fields = ('id', 'effectiveTime', 'active', 'moduleId', 'sourceId', 'destinationId', 'relationshipGroup', 'typeId', 'characteristicTypeId', 'modifierId')
                    copy_from_csv(cursor, data_file, 'Relationship', fields)
-
-            for f in iglob(get_data_file_path('sct2_StatedRelationship*.txt')):
-                with open(f, 'r') as data_file:
-                    fields = ('id', 'effectiveTime', 'active', 'moduleId', 'sourceId', 'destinationId', 'relationshipGroup', 'typeId', 'characteristicTypeId', 'modifierId')
-                    copy_from_csv(cursor, data_file, 'StatedRelationship', fields)
-
-            for f in iglob(get_data_file_path('sct2_TextDefinition*.txt')):
-                with open(f, 'r') as data_file:
-                    fields = ('id', 'effectiveTime', 'active', 'moduleId', 'conceptId', 'languageCode', 'typeId', 'term', 'caseSignificanceId')
-                    copy_from_csv(cursor, data_file, 'TextDefinition', fields)
-
-            for f in iglob(get_data_file_path('der2_cRefset_Language*.txt')):
-                with open(f, 'r') as data_file:
-                    fields = ('id', 'effectiveTime', 'active', 'moduleId', 'refsetId', 'referencedComponentId', 'acceptabilityId')
-                    copy_from_csv(cursor, data_file, 'LanguageRefset', fields)
-
-            for f in iglob(get_data_file_path('der2_cRefset_Association*.txt')):
-                with open(f, 'r') as data_file:
-                    fields = ('id', 'effectiveTime', 'active', 'moduleId', 'refsetId', 'referencedComponentId', 'targetComponentId')
-                    copy_from_csv(cursor, data_file, 'Association', fields)
 
             for f in iglob(get_data_file_path('sct2_TransitiveClosure*.txt')):
 

@@ -6,6 +6,6 @@ import * as middleware from '../../components/middleware'
 
 const router = new Router()
 
-router.get('/', middleware.logRequest('substance', substance.getSubstanceByCriteria.name), substance.getSubstanceByCriteria)
+router.get('/', middleware.hasRequestId(), middleware.logRequest('substance', substance.getSubstanceByCriteria.name), substance.getSubstanceByCriteria)
 
 module.exports = router

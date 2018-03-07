@@ -1,2 +1,3 @@
 CREATE EXTENSION unaccent;
 CREATE EXTENSION fuzzystrmatch;
+CREATE EXTENSION pg_trgm;
