@@ -42,7 +42,7 @@ export function getParents (req, res) {
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
                      WHERE "transitiveClosure"."subtypeId" = ${req.query.conceptId} AND description.active = TRUE AND
-                     "transitiveClosure"."supertypeId" = description."conceptId"
+                           "transitiveClosure"."supertypeId" = description."conceptId"
                      OFFSET ${req.query.skip}
                      LIMIT ${req.query.limit};`
 
@@ -90,7 +90,7 @@ export function getChildren (req, res) {
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
                      WHERE "transitiveClosure"."supertypeId" = ${req.query.conceptId} AND description.active = TRUE AND
-                     "transitiveClosure"."subtypeId" = description."conceptId"
+                           "transitiveClosure"."subtypeId" = description."conceptId"
                      OFFSET ${req.query.skip}
                      LIMIT ${req.query.limit};`
 
@@ -116,11 +116,9 @@ export function getDirectParents (req, res) {
 
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Relationship" relationship, "Description" description
-                     WHERE relationship."destinationId" = ${req.params.id} AND description.active = TRUE AND
-                     relationship."sourceId" = description."conceptId" AND
-                     relationship."typeId" = ${constants.SNOMED.TYPES.RELATIONSHIP.IS_A}
-                     OFFSET ${req.query.skip}
-                     LIMIT ${req.query.limit};`
+                     WHERE relationship."sourceId" = ${req.params.id} AND description.active = TRUE AND
+                           relationship."destinationId" = description."conceptId" AND
+                           relationship."typeId" = ${constants.SNOMED.TYPES.RELATIONSHIP.IS_A};`
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })
@@ -144,11 +142,9 @@ export function getDirectChildren (req, res) {
 
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Relationship" relationship, "Description" description
-                     WHERE relationship."sourceId" = ${req.params.id} AND description.active = TRUE AND
-                     relationship."destinationId" = description."conceptId" AND
-                     relationship."sourceId" = ${constants.SNOMED.TYPES.RELATIONSHIP.IS_A}
-                     OFFSET ${req.query.skip}
-                     LIMIT ${req.query.limit};`
+                     WHERE relationship."destinationId" = ${req.params.id} AND description.active = TRUE AND
+                           relationship."sourceId" = description."conceptId" AND
+                           relationship."typeId" = ${constants.SNOMED.TYPES.RELATIONSHIP.IS_A};`
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })

@@ -95,11 +95,7 @@ export function secondsToTime (seconds) {
 }
 
 export function resolveCallback (resolve, reject) {
-  return (err, data) => {
-    if (err != null) return reject(err)
-
-    return resolve(data)
-  }
+  return (err, data) => err != null ? reject(err) : resolve(data)
 }
 
 export function checkToggle (featureName) {

@@ -6,6 +6,7 @@ import * as middleware from '../../components/middleware'
 
 const router = new Router()
 
+router.get('/synonym', middleware.logRequest('procedure', procedure.getProcedureSynonymByCriteria.name), procedure.getProcedureSynonymByCriteria)
 router.get('/count', middleware.logRequest('procedure', procedure.countProcedureByCriteria.name), procedure.countProcedureByCriteria)
 router.get('/', middleware.logRequest('procedure', procedure.getProcedureByCriteria.name), procedure.getProcedureByCriteria)
 

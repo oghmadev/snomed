@@ -28,7 +28,8 @@ export default {
       SOCIAL_CONTEXT: '48176007',
       SPECIMEN: '123038009',
       STAGING: '254291000',
-      SUBSTANCE: '105590001'
+      SUBSTANCE: '105590001',
+      SPORTS: '415577004'
     }
   }
 }

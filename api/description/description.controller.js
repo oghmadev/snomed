@@ -26,6 +26,10 @@ export function getFSN (req, res) {
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })
+    .then(results => {
+      if (results.length > 1) return results
+      else return results[0]
+    })
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))
     .catch(utils.handleError(res, req.requestId))
