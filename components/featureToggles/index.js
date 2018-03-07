@@ -6,8 +6,8 @@ import { FeatureFileError, FeatureFileMissingError, InvalidFeatureNameError } fr
 
 let features = {}
 
-const FEATURES = ['auth', 'description', 'disorder', 'finding', 'procedure', 'relationship']
-const FEATURES_PATH = `${config.dataPath}/features.toggles`
+const FEATURES = ['description', 'disorder', 'finding', 'procedure', 'relationship', 'substance', 'sports']
+const FEATURES_PATH = `${config.dataPath}/features.json`
 
 export function getFeatureNames () {
   return FEATURES

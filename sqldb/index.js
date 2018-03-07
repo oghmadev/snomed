@@ -17,7 +17,6 @@ db.Relationship = db.sequelize.import('./model/relationship.model')
 db.StatedRelationship = db.sequelize.import('./model/statedRelationship.model')
 db.TextDefinition = db.sequelize.import('./model/textDefinition.model')
 db.TransitiveClosure = db.sequelize.import('./model/transitiveClosure.model')
-db.User = db.sequelize.import('./model/user.model')
 
 Associations(db)
 

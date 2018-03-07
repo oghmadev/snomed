@@ -105,7 +105,7 @@ gulp.task('start', () => {
   process.env.NODE_ENV = process.env.NODE_ENV || 'development'
   config = require(`./config/environment`)
 
-  nodemon(`-w . .`)
+  nodemon(`-w ${paths.scripts} ${paths.scripts}`)
 })
 
 gulp.task('start:prod', () => {
@@ -119,7 +119,7 @@ gulp.task('start:debug', () => {
   process.env.NODE_ENV = process.env.NODE_ENV || 'development'
   config = require(`./config/environment`)
 
-  nodemon(`-w . --debug=5858 --debug-brk .`)
+  nodemon(`-w ${paths.scripts} --debug=5858 --debug-brk ${paths.scripts}`)
 })
 
 gulp.task('watch', () => {
@@ -167,7 +167,7 @@ gulp.task('webdriver_update', webdriver_update)
  ********************/
 
 gulp.task('build', cb => {
-  runSequence(['clean:dist', 'clean:tmp'], 'transpile', ['copy'], 'revReplaceWebpack', cb)
+  runSequence(['clean:dist', 'clean:tmp'], 'transpile', ['copy'], cb)
 })
 
 gulp.task('clean:dist', () => del([`${paths.dist}/!(.git*|.openshift|Procfile)**`], {dot: true}))

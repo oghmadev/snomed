@@ -5,16 +5,16 @@ import { sequelize } from '../../sqldb'
 import { APIParamMissingError } from '../../components/errors'
 import constants from '../../components/constants'
 
-export function getFindingsByCriteria (req, res) {
-  return utils.checkToggle('finding')
+export function getSportsByCriteria (req, res) {
+  return utils.checkToggle('sports')
     .then(() => {
       if (req.query.criteria == null) {
         throw new APIParamMissingError({
           missingParams: ['criteria'],
           endpoint: req.originalUrl,
           method: req.method,
-          controllerFunction: getFindingsByCriteria.name,
-          message: 'finding.criteria.missing'
+          controllerFunction: getSportsByCriteria.name,
+          message: 'sports.params.missing'
         })
       }
 
@@ -24,11 +24,11 @@ export function getFindingsByCriteria (req, res) {
 
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                     WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.FINDING} AND 
+                     WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.SPORTS} AND 
                            description.active = TRUE AND "transitiveClosure"."subtypeId" = description."conceptId" AND 
                            unaccent(description."term") ILIKE '%${criteria}%' AND 
-                           description."typeId" <> ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
-                     ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC              
+                           description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
+                     ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC                   
                      LIMIT 10
                      OFFSET 0;`
 

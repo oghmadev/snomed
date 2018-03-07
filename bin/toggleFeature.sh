@@ -16,7 +16,7 @@ function includes {
 }
 
 BIN_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
-FEATURE_FILE_PATH="$( echo ${BIN_PATH%bin*}data/features.toggles )"
+FEATURE_FILE_PATH="$( echo ${BIN_PATH%bin*}data/features.json )"
 IFS=',' read -r -a FEATURE_LIST <<< "$( jq -j 'keys[] as $k | "\($k),"' ${FEATURE_FILE_PATH} | sed 's/.$//' )"
 
 if [ -z "$1" ]; then
