@@ -1,3 +1,6 @@
 'use strict'
 
-module.exports = {}
+module.exports = {
+  API_PASSPHRASE: 'FariasMurillasQuiñonez',
+  verification: {user: 'Sirona', iat: 1520442948}
+}

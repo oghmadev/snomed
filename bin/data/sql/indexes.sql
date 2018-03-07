@@ -1,7 +1,7 @@
-CREATE INDEX description_conceptid_index
+CREATE INDEX description_conceptid_idx
   ON "Description" USING BTREE ("conceptId");
 
-CREATE INDEX textdefinition_conceptid_index
+CREATE INDEX textdefinition_conceptid_idx
   ON "TextDefinition" USING BTREE ("conceptId");
 
 CREATE INDEX relationship_sourceid_destinationid_idx
@@ -28,8 +28,11 @@ CREATE INDEX langrefset_referencedcomponentid_idx
 CREATE INDEX associationrefset_f_idx
   ON "Association" USING BTREE ("referencedComponentId", "targetComponentId");
 
-CREATE INDEX transitiveclosure_subtypeid_index
+CREATE INDEX transitiveclosure_subtypeid_idx
   ON "TransitiveClosure" USING BTREE ("subtypeId");
 
-CREATE INDEX transitiveclosure_supertypeid_index
+CREATE INDEX transitiveclosure_supertypeid_idx
   ON "TransitiveClosure" USING BTREE ("supertypeId");
+
+CREATE INDEX description_term_trgm_idx
+  ON "Description" USING gin (term gin_trgm_ops);
