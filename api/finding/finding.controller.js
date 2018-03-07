@@ -28,7 +28,7 @@ export function getFindingsByCriteria (req, res) {
                            description.active = TRUE AND "transitiveClosure"."subtypeId" = description."conceptId" AND 
                            unaccent(description."term") ILIKE '%${criteria}%' AND 
                            description."typeId" <> ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
-                     ORDER BY description.term ASC                   
+                     ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC              
                      LIMIT 10
                      OFFSET 0;`
 

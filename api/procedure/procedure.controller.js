@@ -82,6 +82,7 @@ export function getProcedureByCriteria (req, res) {
                                         "transitiveClosure"."subtypeId" = description."conceptId" AND 
                                         unaccent(description."term") ILIKE '%${criteria}%' AND 
                                         description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
+                                  ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC
                                   LIMIT ${req.query.limit}
                                   OFFSET ${req.query.skip})
                      SELECT description.id, description."conceptId", description.term, description."typeId"
@@ -126,7 +127,7 @@ export function getProcedureSynonymByCriteria (req, res) {
                            description.active = TRUE AND "transitiveClosure"."subtypeId" = description."conceptId" AND 
                            unaccent(description."term") ILIKE '%${criteria}%' AND 
                            description."typeId" <> ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
-                     ORDER BY description.term ASC
+                     ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC
                      LIMIT 10
                      OFFSET 0;`
 

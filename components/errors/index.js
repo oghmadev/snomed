@@ -48,33 +48,6 @@ class APIParamInvalidError extends APIError {
   }
 }
 
-class AuthenticationError extends BaseError {
-  constructor (parent) {
-    super(parent)
-
-    this.name = 'SnomedAuthenticationError'
-    this.statusCode = 401
-  }
-}
-
-class UserNotFoundError extends AuthenticationError {
-  constructor (parent) {
-    super(parent)
-
-    this.name = 'SnomedUserNotFoundError'
-    this.statusCode = 404
-  }
-}
-
-class UserInactiveError extends AuthenticationError {
-  constructor (parent) {
-    super(parent)
-
-    this.name = 'SnomedUserInactiveFoundError'
-    this.statusCode = 403
-  }
-}
-
 class FeatureUnavailableError extends BaseError {
   constructor (parent) {
     super(parent)
@@ -124,9 +97,6 @@ module.exports = {
   APIError,
   APIParamMissingError,
   APIParamInvalidError,
-  AuthenticationError,
-  UserNotFoundError,
-  UserInactiveError,
   FeatureUnavailableError,
   FeatureFileError,
   FeatureFileMissingError,

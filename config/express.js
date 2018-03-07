@@ -11,14 +11,9 @@ import errorHandler from 'errorhandler'
 import path from 'path'
 import lusca from 'lusca'
 import config from './environment'
-import passport from 'passport'
-import session from 'express-session'
-import sqldb from '../sqldb'
-import connectSessionSequelize from 'connect-session-sequelize'
 import logger from '../config/logs'
 
 const morganFormat = ':date[iso],:req[X-Request-ID],:method,:url,:status,:response-time,:res[content-length],:referrer,:remote-user,:remote-addr,:req[header],:user-agent'
-const Store = connectSessionSequelize(session.Store)
 
 export default function (app) {
   const env = app.get('env')
@@ -44,16 +39,6 @@ export default function (app) {
   app.use(bodyParser.json())
   app.use(methodOverride())
   app.use(cookieParser())
-  app.use(passport.initialize())
-
-  // Persist sessions with MongoStore / sequelizeStore
-  // oauth 1.0 strategy, and Lusca depends on sessions
-  app.use(session({
-    secret: config.secrets.session,
-    saveUninitialized: true,
-    resave: false,
-    store: new Store({db: sqldb.sequelize})
-  }))
 
   /**
    * Lusca - express server security

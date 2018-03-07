@@ -21,8 +21,7 @@ export function getFSN (req, res) {
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Description" description
                      WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE AND
-                           description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
-                     ORDER BY description.term ASC;`
+                           description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN};`
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })
@@ -48,8 +47,7 @@ export function getSynonyms (req, res) {
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Description" description
                      WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE AND
-                           description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}
-                     ORDER BY description.term ASC;`
+                           description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM};`
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })
@@ -73,8 +71,7 @@ export function getComplete (req, res) {
 
       const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
                      FROM "Description" description
-                     WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE
-                     ORDER BY description.term ASC;`
+                     WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE;`
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })

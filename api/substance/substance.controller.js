@@ -26,9 +26,9 @@ export function getSubstanceByCriteria (req, res) {
                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
                      WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.SUBSTANCE} AND 
                            description.active = TRUE AND "transitiveClosure"."subtypeId" = description."conceptId" AND 
-                           (unaccent(description."term") ILIKE '${criteria}' OR unaccent(description."term") ILIKE '%${criteria}%') AND 
+                           unaccent(description."term") ILIKE '%${criteria}%' AND 
                            description."typeId" <> ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
-                     ORDER BY description.term ASC                   
+                     ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC                   
                      LIMIT 10
                      OFFSET 0;`
 
