@@ -104,7 +104,7 @@ export function checkToggle (featureName) {
       feature: featureName,
       message: `${featureName}.feature.inactive`
     }))
-  } else {
-    return Promise.resolve(null)
   }
+
+  return Promise.resolve(null)
 }

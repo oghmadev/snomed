@@ -25,9 +25,9 @@ export function verifyAPIKEY () {
         return res.status(403).send('Forbidden')
       } else {
         const token = req.get('X-API-KEY')
-        const verificationObject = jwt.verify(token, LOCAL_ENV.API_PASSPHRASE)
+        const decodedKey = jwt.verify(token, LOCAL_ENV.API_PASSPHRASE)
 
-        if (LOCAL_ENV.verification.iat === verificationObject.iat && LOCAL_ENV.verification.user === verificationObject.user) return next()
+        if (LOCAL_ENV.verification.iat === decodedKey.iat && LOCAL_ENV.verification.user === decodedKey.user) return next()
 
         return res.status(403).send('Forbidden')
       }

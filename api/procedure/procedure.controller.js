@@ -22,12 +22,15 @@ export function countProcedureByCriteria (req, res) {
         .split(/\s/)
         .join('%')
 
-      const query = `SELECT COUNT(*)
-                     FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                     WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE} AND 
-                           description.active = TRUE AND "transitiveClosure"."subtypeId" = description."conceptId" AND 
-                           unaccent(description."term") ILIKE '%${criteria}%' AND 
-                           description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN};`
+      const query = `WITH temp AS (SELECT DISTINCT description."conceptId"
+                                   FROM "TransitiveClosure" "transitiveClosure", "Description" description
+                                   WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE} AND 
+                                         description.active = TRUE AND 
+                                         "transitiveClosure"."subtypeId" = description."conceptId" AND 
+                                         unaccent(description."term") ILIKE '%${criteria}%' AND 
+                                         description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM})
+                     SELECT COUNT(*)
+                     FROM temp;`
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })
@@ -75,19 +78,25 @@ export function getProcedureByCriteria (req, res) {
         .split(/\s/)
         .join('%')
 
-      const query = `WITH FSN AS (SELECT description."conceptId"
-                                  FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                                  WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE} AND 
-                                        description.active = TRUE AND
-                                        "transitiveClosure"."subtypeId" = description."conceptId" AND 
-                                        unaccent(description."term") ILIKE '%${criteria}%' AND 
-                                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
-                                  ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC
-                                  LIMIT ${req.query.limit}
-                                  OFFSET ${req.query.skip})
-                     SELECT description.id, description."conceptId", description.term, description."typeId"
-                     FROM "Description" description, FSN
-                     WHERE description."conceptId" = FSN."conceptId";`
+      const query = `WITH concepts AS (SELECT DISTINCT
+                                         description."conceptId",
+                                         (levenshtein('${req.query.criteria.trim()}', description.term)) AS distance
+                                       FROM "TransitiveClosure" "transitiveClosure", "Description" description
+                                       WHERE description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
+                                             description.active = TRUE AND 
+                                             unaccent(description.term) ILIKE '%${criteria}%' AND
+                                             "transitiveClosure"."subtypeId" = description."conceptId" AND
+                                             "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE}
+                                       ORDER BY distance ASC
+                                       LIMIT ${req.query.limit}
+                                       OFFSET ${req.query.skip})
+                     SELECT
+                       description.id,
+                       description."conceptId",
+                       description.term,
+                       description."typeId"
+                     FROM "Description" description, concepts
+                     WHERE description."conceptId" = concepts."conceptId";`
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })
@@ -121,12 +130,17 @@ export function getProcedureSynonymByCriteria (req, res) {
         .split(/\s/)
         .join('%')
 
-      const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
+      const query = `SELECT 
+                       description.id,
+                       description."conceptId",
+                       description.term,
+                       description."typeId"
                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
                      WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE} AND 
-                           description.active = TRUE AND "transitiveClosure"."subtypeId" = description."conceptId" AND 
+                           description.active = TRUE AND 
+                           "transitiveClosure"."subtypeId" = description."conceptId" AND 
                            unaccent(description."term") ILIKE '%${criteria}%' AND 
-                           description."typeId" <> ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
+                           description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}
                      ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC
                      LIMIT 10
                      OFFSET 0;`

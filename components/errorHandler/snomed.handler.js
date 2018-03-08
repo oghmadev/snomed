@@ -2,7 +2,7 @@
 
 import logger from '../../config/logs'
 
-export default function SnomedErrorHandler (error) {
+export default function SNOMEDErrorHandler (error) {
   logger.snomed.console.error(`${error.name}: ${error.message}`)
   logger.snomed.error.log(Object.assign({
     level: 'error',
