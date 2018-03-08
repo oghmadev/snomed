@@ -1,0 +1,41 @@
+version: '3.4'
+services:
+  server:
+    image: snomed-server
+    build:
+      context: .
+      args:
+        - NODE_VERSION
+      dockerfile: image/build/server
+    depends_on:
+      - database
+    networks:
+      app:
+      data:
+      backend:
+        aliases:
+          - snomed-app
+    volumes:
+      - "${STORAGE_DIR}/logs:/usr/app/snomed/logs"
+      - "/etc/secrets/snomed/db.conf.js:/etc/secrets/snomed/db.conf.js:ro"
+
+  database:
+    image: postgres:${POSTGRES_VERSION}
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD_FILE
+    networks:
+      data:
+      backend:
+        aliases:
+          - snomed-db
+    volumes:
+      - "${STORAGE_DIR}/data:/var/lib/postgresql/data"
+      - "/etc/secrets/snomed/pgpass:/etc/secrets/snomed/pgpass:ro"
+
+networks:
+  app:
+  data:
+  backend:
+    external: true

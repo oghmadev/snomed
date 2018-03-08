@@ -12,19 +12,16 @@ import { Instrumenter } from 'isparta'
 
 let config
 const plugins = gulpLoadPlugins()
-const paths = {
-  scripts: [`./app.js`, `./index.js`, `./(api|component|config)/**/!(*.spec|*.integration).js`, `!./config/local.env.sample.js`],
+const appPath = 'app'
+const distPath = 'dist'
+const dockerPath = 'docker'
+const scripts = {
+  app: [`${appPath}/**/!(*.spec|*.integration).js`],
   test: {
-    integration: [`./**/*.integration.js`, 'mocha.global.js'],
-    unit: [`./**/*.spec.js`, 'mocha.global.js']
-  },
-  karma: 'karma.conf.js',
-  dist: 'dist'
+    integration: [`${appPath}/**/*.integration.js`, 'mocha.global.js'],
+    unit: [`${appPath}/**/*.spec.js`, 'mocha.global.js']
+  }
 }
-
-/********************
- * Helper functions
- ********************/
 
 /********************
  * Reusable pipelines
@@ -60,7 +57,7 @@ gulp.task('env:all', () => {
   let localConfig
 
   try {
-    localConfig = require(`./config/local.env`)
+    localConfig = require(`./${appPath}/config/local.env`)
   } catch (e) {
     localConfig = {}
   }
@@ -80,19 +77,19 @@ gulp.task('env:prod', () => {
  * Tasks
  ********************/
 
-gulp.task('transpile', () => gulp.src(paths.scripts)
+gulp.task('transpile', () => gulp.src(scripts.app)
   .pipe(plugins.sourcemaps.init())
   .pipe(plugins.babel({
     plugins: ['transform-class-properties', 'transform-runtime']
   }))
   .pipe(plugins.sourcemaps.write('.'))
-  .pipe(gulp.dest(`${paths.dist}`)))
+  .pipe(gulp.dest(`${distPath}/${appPath}`)))
 
-gulp.task('lint:scripts', () => gulp.src(_.union(paths.scripts, _.map(paths.test, blob => `!${blob}`)))
+gulp.task('lint:scripts', () => gulp.src(_.union(scripts.app, _.map(scripts.test, blob => `!${blob}`)))
   .pipe(plugins.eslint(`.eslintrc`))
   .pipe(plugins.eslint.format()))
 
-gulp.task('lint:scripts:test', () => gulp.src(_.union(paths.test.integration, paths.test.unit))
+gulp.task('lint:scripts:test', () => gulp.src(_.union(scripts.test.integration, scripts.test.unit))
   .pipe(plugins.eslint({
     configFile: `.eslintrc`,
     envs: ['node', 'es6', 'mocha']
@@ -103,28 +100,28 @@ gulp.task('clean:tmp', () => del(['.tmp/**/*'], {dot: true}))
 
 gulp.task('start', () => {
   process.env.NODE_ENV = process.env.NODE_ENV || 'development'
-  config = require(`./config/environment`)
+  config = require(`./${appPath}/config/environment`)
 
-  nodemon(`-w ${paths.scripts} ${paths.scripts}`)
+  nodemon(`-w ${appPath} ${appPath}`)
 })
 
 gulp.task('start:prod', () => {
   process.env.NODE_ENV = process.env.NODE_ENV || 'production'
-  config = require(`./${paths.dist}/config/environment`)
+  config = require(`./${distPath}/config/environment`)
 
-  nodemon(`-w ${paths.dist} ${paths.dist}`)
+  nodemon(`-w ${distPath}/${appPath} ${distPath}/${appPath}`)
 })
 
 gulp.task('start:debug', () => {
   process.env.NODE_ENV = process.env.NODE_ENV || 'development'
-  config = require(`./config/environment`)
+  config = require(`./${appPath}/config/environment`)
 
-  nodemon(`-w ${paths.scripts} --debug=5858 --debug-brk ${paths.scripts}`)
+  nodemon(`-w ${appPath} --debug=5858 --debug-brk ${appPath}`)
 })
 
 gulp.task('watch', () => {
-  gulp.watch(paths.scripts, ['lint:scripts'])
-  gulp.watch(_.union(paths.test.integration, paths.test.unit), ['lint:scripts:test'])
+  gulp.watch(scripts.app, ['lint:scripts'])
+  gulp.watch(_.union(scripts.test.integration, scripts.test.unit), ['lint:scripts:test'])
 })
 
 gulp.task('serve', cb => runSequence(['clean:tmp', 'lint:scripts', 'env:all'], ['start'], 'watch', cb))
@@ -135,27 +132,27 @@ gulp.task('serve:dist', cb => runSequence('build', 'env:all', 'env:prod', ['star
 
 gulp.task('test', cb => runSequence('env:all', 'env:test', 'mocha:unit', 'mocha:integration', cb))
 
-gulp.task('mocha:unit', () => gulp.src(paths.test.unit)
+gulp.task('mocha:unit', () => gulp.src(scripts.test.unit)
   .pipe(mocha()))
 
-gulp.task('mocha:integration', () => gulp.src(paths.test.integration)
+gulp.task('mocha:integration', () => gulp.src(scripts.test.integration)
   .pipe(mocha()))
 
 gulp.task('test:server:coverage', cb => runSequence('coverage:pre', 'env:all', 'env:test', 'coverage:unit',
   'coverage:integration', cb))
 
-gulp.task('coverage:pre', () => gulp.src(paths.scripts)
+gulp.task('coverage:pre', () => gulp.src(scripts.app)
   .pipe(plugins.istanbul({
     instrumenter: Instrumenter, // Use the isparta instrumenter (code coverage for ES6)
     includeUntested: true
   }))
   .pipe(plugins.istanbul.hookRequire()))
 
-gulp.task('coverage:unit', () => gulp.src(paths.test.unit)
+gulp.task('coverage:unit', () => gulp.src(scripts.test.unit)
   .pipe(mocha())
   .pipe(istanbul()))
 
-gulp.task('coverage:integration', () => gulp.src(paths.test.integration)
+gulp.task('coverage:integration', () => gulp.src(scripts.test.integration)
   .pipe(mocha())
   .pipe(istanbul()))
 
@@ -167,10 +164,13 @@ gulp.task('webdriver_update', webdriver_update)
  ********************/
 
 gulp.task('build', cb => {
-  runSequence(['clean:dist', 'clean:tmp'], 'transpile', ['copy'], cb)
+  runSequence(['clean:dist', 'clean:tmp'], 'transpile', ['copy', 'copy:docker'], cb)
 })
 
-gulp.task('clean:dist', () => del([`${paths.dist}/!(.git*|.openshift|Procfile)**`], {dot: true}))
+gulp.task('clean:dist', () => del([`${distPath}/!(.git*|.openshift|Procfile)**`], {dot: true}))
 
 gulp.task('copy', () => gulp.src(['package.json', 'package-lock.json'], {cwdbase: true})
-  .pipe(gulp.dest(paths.dist)))
+  .pipe(gulp.dest(distPath)))
+
+gulp.task('copy:docker', () => gulp.src([`${dockerPath}/**/*`, `${dockerPath}/.env`])
+  .pipe(gulp.dest(distPath)))

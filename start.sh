@@ -25,9 +25,15 @@ function update {
   docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${PWD}:/usr/app/snomed" snomed_app npm install
 }
 
+function build {
+  set_env
+  docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${PWD}:/usr/app/snomed" snomed_app gulp build
+}
+
 function print_usage {
-  echo "Usage: $0 [-i] [-u] [-s]"
+  echo "Usage: $0 [-b] [-i] [-u] [-s] [-d]"
   echo "  -i Do initial configuration"
+  echo "  -b Build the project"
   echo "  -u Update node image and dependencies"
   echo "  -s Start application"
   echo "  -d Stop application and delete containers"
@@ -38,9 +44,10 @@ if [[ $# -eq 0 ]]; then
   exit 1
 fi
 
-while getopts "iusdh" OPT; do
+while getopts "ibusdh" OPT; do
   case "$OPT" in
     i) check_network; update;;
+    b) build;;
     u) update;;
     s) set_env; docker-compose up;;
     d) set_env; docker-compose down;;

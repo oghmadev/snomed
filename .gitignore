@@ -9,7 +9,7 @@ dist
 tags
 coverage
 
-config/local.env.js
+app/config/local.env.js
 
 /logs/
 /data/features.json
