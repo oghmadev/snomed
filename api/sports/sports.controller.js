@@ -22,15 +22,26 @@ export function getSportsByCriteria (req, res) {
         .split(/\s/)
         .join('%')
 
-      const query = `SELECT description.id, description."conceptId", description.term, description."typeId"
-                     FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                     WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.SPORTS} AND 
-                           description.active = TRUE AND "transitiveClosure"."subtypeId" = description."conceptId" AND 
-                           unaccent(description."term") ILIKE '%${criteria}%' AND 
-                           description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.FSN}
-                     ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC                   
-                     LIMIT 10
-                     OFFSET 0;`
+      const query = `WITH temp AS (SELECT DISTINCT description."conceptId",
+                                     (levenshtein('${req.query.criteria.trim()}', description.term)) AS distance
+                                   FROM "TransitiveClosure" "transitiveClosure", "Description" description
+                                   WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.SPORTS} AND
+                                         description.active = TRUE AND
+                                          "transitiveClosure"."subtypeId" = description."conceptId" AND
+                                         unaccent(description."term") ILIKE '%${criteria}%' 
+                                   ORDER BY distance ASC
+                                   LIMIT 10
+                                   OFFSET 0)
+                     SELECT
+                       description.id,
+                       description."conceptId",
+                       description.term,
+                       description."typeId"
+                     FROM "Description" description, temp
+                     WHERE description."conceptId" = temp."conceptId" AND
+                           levenshtein('${req.query.criteria.trim()}', description.term) = (SELECT MIN(levenshtein('${req.query.criteria.trim()}', term))
+                                                                                            FROM "Description"
+                                                                                            WHERE "conceptId" = temp."conceptId");`
 
       return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     })
