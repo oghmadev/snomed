@@ -1,0 +1,15 @@
+#!/bin/bash
+
+GIT_DIRECTORY=$(readlink -f $(git rev-parse --git-dir))
+GIT_HOOKS_DIRECTORY=${GIT_DIRECTORY}/hooks
+PROJECT_BASE_DIR=$(dirname $GIT_DIRECTORY)
+HOOKS_DIRECTORY=${PROJECT_BASE_DIR}/bin/hooks
+
+echo "Installing git hooks located in ${HOOKS_DIRECTORY}"
+for hook in ${HOOKS_DIRECTORY}/*; do
+    echo -n "Installing $(basename $hook)..."
+
+    output=$(ln -sf $hook $GIT_HOOKS_DIRECTORY 2>&1)
+
+    [[ $? -eq 0 ]] && echo " Done" || { echo " Error"; echo -e "\tError Details: $output"; }
+done

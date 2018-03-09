@@ -12,7 +12,6 @@ coverage
 app/config/local.env.js
 
 /logs/
-/data/features.json
 
 __pycache__
 /temp/

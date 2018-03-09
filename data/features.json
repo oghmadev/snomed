@@ -1,0 +1,30 @@
+{
+  "description": {
+    "value": true,
+    "description": ""
+  },
+  "disorder": {
+    "value": true,
+    "description": ""
+  },
+  "finding": {
+    "value": true,
+    "description": ""
+  },
+  "procedure": {
+    "value": true,
+    "description": ""
+  },
+  "relationship": {
+    "value": true,
+    "description": ""
+  },
+  "substance": {
+    "value": true,
+    "description": ""
+  },
+  "sports": {
+    "value": true,
+    "description": ""
+  }
+}

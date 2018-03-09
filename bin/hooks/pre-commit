@@ -1,0 +1,38 @@
+#!/bin/bash
+
+GIT_DIRECTORY=$(readlink -f $(git rev-parse --git-dir))
+PROJECT_BASE_DIR=$(dirname $GIT_DIRECTORY)
+ESLINT_DIRECTORY=${PROJECT_BASE_DIR}/node_modules/eslint
+
+printf "\e[1;36mAsserting your ability to follow standards...\e[0m\n"
+
+# Ensure all JavaScript files staged for commit pass standard code style
+function xargs-r() {
+  # Portable version of "xargs -r". The -r flag is a GNU extension that
+  # prevents xargs from running if there are no input files.
+  if IFS= read -r -d '' file_rel_path; then
+    { echo -n "${PROJECT_BASE_DIR}/${file_rel_path}"; echo -ne "\0"; cat; } | xargs $@
+  fi
+}
+
+git diff -z --name-only --cached --relative | grep -z '\.jsx\?$' | xargs-r -0 -t ${ESLINT_DIRECTORY}/bin/eslint.js
+
+if [[ $? -ne 0 ]]; then
+  printf "\033[1;31mJavaScript Standard Style errors were detected. Aborting commit.\033[0m\n"
+  exit 1
+fi
+
+printf "\e[1;32mS'all good man! Good boy!\e[0m\n"
+
+# Don't allow console.log() statements to be committed.
+printf "\e[1;36mChecking for rougue console.log statements...\e[0m\n"
+
+COUNT_CLIENT=`grep -iR 'console\.log' ${PROJECT_BASE_DIR}/client/ | wc -l`
+COUNT_SERVER=`grep -iR 'console\.log' ${PROJECT_BASE_DIR}/server/ | wc -l`
+
+if [[ "$COUNT_CLIENT" -gt 0 || "$COUNT_SERVER" -gt 0 ]]; then
+  printf "\033[1;31mBusted! console.log found! Aborting commit.\033[0m\n"
+  exit 1
+fi
+
+printf "\e[1;32mAll clear! You're good to go.\e[0m\n"
