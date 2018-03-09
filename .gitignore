@@ -16,7 +16,6 @@ app/config/local.env.js
 
 __pycache__
 /temp/
-/bin/data/snomed/
-/bin/data/sct2_*.txt
-/bin/data/der2_*.txt
-/bin/data/snomed.tar.xz
+/bin/init/data/sct2_*.txt
+/bin/init/data/der2_*.txt
+/bin/init/data/snomed.tar.xz

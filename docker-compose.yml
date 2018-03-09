@@ -14,6 +14,8 @@ services:
       - "${PWD}:/usr/app/snomed"
     networks:
       default:
+        aliases:
+          - snomed-app
       backend:
         aliases:
           - snomed-app
@@ -28,7 +30,6 @@ services:
       - POSTGRES_PASSWORD=test
     networks:
       default:
-      backend:
         aliases:
           - snomed-db
 

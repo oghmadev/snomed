@@ -10,8 +10,9 @@ services:
     depends_on:
       - database
     networks:
-      app:
       data:
+        aliases:
+          - snomed-app
       backend:
         aliases:
           - snomed-app
@@ -27,7 +28,6 @@ services:
       - POSTGRES_PASSWORD_FILE
     networks:
       data:
-      backend:
         aliases:
           - snomed-db
     volumes:
@@ -35,7 +35,6 @@ services:
       - "/etc/secrets/snomed/pgpass:/etc/secrets/snomed/pgpass:ro"
 
 networks:
-  app:
   data:
   backend:
     external: true
