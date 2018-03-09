@@ -6,8 +6,6 @@ services:
       args:
         - NODE_VERSION
       context: .
-    ports:
-      - "9000:9000"
     depends_on:
       - database
     volumes:
@@ -15,15 +13,13 @@ services:
     networks:
       default:
         aliases:
-          - snomed-app
+          - snomed-api
       backend:
         aliases:
-          - snomed-app
+          - snomed-api
 
   database:
     image: postgres:${POSTGRES_VERSION}
-    ports:
-      - "6100:5432"
     environment:
       - POSTGRES_DB=snomed-dev
       - POSTGRES_USER=snomed-dev

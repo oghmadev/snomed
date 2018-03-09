@@ -7,21 +7,23 @@ services:
       args:
         - NODE_VERSION
       dockerfile: image/build/server
+    restart: unless-stopped
     depends_on:
       - database
     networks:
       data:
         aliases:
-          - snomed-app
+          - snomed-api
       backend:
         aliases:
-          - snomed-app
+          - snomed-api
     volumes:
       - "${STORAGE_DIR}/logs:/usr/app/snomed/logs"
       - "/etc/secrets/snomed/db.conf.js:/etc/secrets/snomed/db.conf.js:ro"
 
   database:
     image: postgres:${POSTGRES_VERSION}
+    restart: unless-stopped
     environment:
       - POSTGRES_DB
       - POSTGRES_USER
