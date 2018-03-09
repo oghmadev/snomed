@@ -1,12 +1,12 @@
 version: '3.4'
 services:
-  server:
-    image: snomed-server
+  api:
+    image: snomed-api
     build:
       context: .
       args:
         - NODE_VERSION
-      dockerfile: image/build/server
+      dockerfile: image/build/snomed-api
     restart: unless-stopped
     depends_on:
       - database
@@ -14,7 +14,7 @@ services:
       data:
         aliases:
           - snomed-api
-      backend:
+      tuatha-de-danann:
         aliases:
           - snomed-api
     volumes:
@@ -38,5 +38,5 @@ services:
 
 networks:
   data:
-  backend:
+  tuatha-de-danann:
     external: true

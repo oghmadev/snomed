@@ -1,6 +1,6 @@
 version: '3.4'
 services:
-  app:
+  api:
     user: ${USER_ID}:${GROUP_ID}
     build:
       args:
@@ -14,7 +14,7 @@ services:
       default:
         aliases:
           - snomed-api
-      backend:
+      tuatha-de-danann:
         aliases:
           - snomed-api
 
@@ -31,5 +31,5 @@ services:
 
 networks:
   default:
-  backend:
+  tuatha-de-danann:
     external: true

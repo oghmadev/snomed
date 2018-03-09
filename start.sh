@@ -6,12 +6,12 @@ function set_env {
 }
 
 function check_network {
-  echo "Checking if network backend exists..."
-  local BACKEND_NETWORK_ID=$(docker network ls -f name=backend -q)
+  echo "Checking if shared network exists..."
+  local BACKEND_NETWORK_ID=$(docker network ls -f name=tuatha-de-danann -q)
 
   if [[ -z "$BACKEND_NETWORK_ID" ]]; then
     echo "Network not found! Network will be created..."
-    docker network create backend
+    docker network create tuatha-de-danann
   else
     echo "Network already exists! Skipping creation."
   fi
@@ -22,12 +22,12 @@ function update {
   echo "Building docker image..."
   docker-compose build
   echo "Updating node dependencies..."
-  docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${PWD}:/usr/app/snomed" snomed_app npm install
+  docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${PWD}:/usr/app/snomed" snomed_api npm install
 }
 
 function build {
   set_env
-  docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${PWD}:/usr/app/snomed" snomed_app gulp build
+  docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${PWD}:/usr/app/snomed" snomed_api gulp build
 }
 
 function print_usage {
