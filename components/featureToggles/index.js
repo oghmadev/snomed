@@ -3,9 +3,18 @@
 import fs from 'fs'
 import config from '../../config/environment'
 import { FeatureFileError, FeatureFileMissingError, InvalidFeatureNameError } from '../../components/errors'
+import featureToggles from '../../data/features'
 
-let features = {}
 let FEATURES = []
+let features = {}
+
+for (let property in featureToggles) {
+  if (featureToggles.hasOwnProperty(property)) {
+    FEATURES.push(property)
+    features[property] = featureToggles[property].value
+  }
+}
+
 const FEATURES_PATH = `${config.dataPath}/features.json`
 
 export function getFeatureNames () {

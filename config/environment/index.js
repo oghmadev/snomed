@@ -1,7 +1,6 @@
 'use strict'
 
 import path from 'path'
-import shared from '../../config/environment/shared'
 
 const all = {
   env: process.env.NODE_ENV,
@@ -11,4 +10,4 @@ const all = {
   secrets: {session: 'snomed-secret'}
 }
 
-module.exports = Object.assign(all, shared, require(`./${process.env.NODE_ENV}.js`) || {})
+module.exports = Object.assign(all, require(`./${process.env.NODE_ENV}.js`) || {})
