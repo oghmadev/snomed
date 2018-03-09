@@ -33,7 +33,7 @@ else
   !(includes VALUES "$2") && echo "${2} is not a valid toggle value" && exit 0
 fi
 
-FEATURE_TOGGLES="$( jq ".${1} = ${2}" ${FEATURE_FILE_PATH} )"
+FEATURE_TOGGLES="$( jq ".${1}.value = ${2}" ${FEATURE_FILE_PATH} )"
 
 echo ${FEATURE_TOGGLES} > ${FEATURE_FILE_PATH}
 

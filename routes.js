@@ -4,7 +4,7 @@ import { version } from './package'
 import { getFeatureNames } from './components/featureToggles'
 
 export default function (app) {
-  const API_PATH = `/api/v${version}`
+  const API_PATH = `/snomed/v${version}`
 
   if (process.env.NODE_ENV === 'development') {
     app.use((req, res, next) => {
