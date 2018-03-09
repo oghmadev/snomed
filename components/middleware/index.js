@@ -45,25 +45,6 @@ export function logRequest (controllerName, functionName) {
   }
 }
 
-export function checkToggle (featureName) {
-  return compose()
-    .use((req, res, next) => {
-      if (!isFeatureToggled(featureName)) {
-        const error = new FeatureUnavailableError({
-          feature: featureName,
-          message: `${featureName}.feature.inactive`
-        })
-
-        errorHandler(error)
-
-        return res.status(503).send('Service Unavailable')
-      }
-
-      return next()
-    })
-    .use(hasRequestId())
-}
-
 export function validateParams (params, featureName, functionName) {
   return compose()
     .use(checkToggle(featureName))
@@ -87,4 +68,23 @@ export function validateParams (params, featureName, functionName) {
       return next()
     })
     .use(logRequest(featureName, functionName))
+}
+
+function checkToggle (featureName) {
+  return compose()
+    .use((req, res, next) => {
+      if (!isFeatureToggled(featureName)) {
+        const error = new FeatureUnavailableError({
+          feature: featureName,
+          message: `${featureName}.feature.inactive`
+        })
+
+        errorHandler(error)
+
+        return res.status(503).send('Service Unavailable')
+      }
+
+      return next()
+    })
+    .use(hasRequestId())
 }
