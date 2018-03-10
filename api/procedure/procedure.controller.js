@@ -14,8 +14,8 @@ export function countProcedureByCriteria (req, res) {
                                FROM "TransitiveClosure" "transitiveClosure", "Description" description
                                WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE} AND
                                      "transitiveClosure"."subtypeId" = description."conceptId" AND
-                                     description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}) AND
-                                     unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE
+                                     description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
+                                     unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE)
                  SELECT COUNT(*)
                  FROM temp;`
 
