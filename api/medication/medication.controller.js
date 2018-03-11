@@ -2,20 +2,45 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamInvalidError } from '../../components/errors'
 import constants from '../../components/constants'
+import { APIParamInvalidError } from '../../components/errors'
 
-export function countProcedureByCriteria (req, res) {
+export function getPresentationByCriteria (req, res) {
+  const criteria = req.query.criteria.trim()
+    .split(/\s/)
+    .join('%')
+
+  const query = `SELECT 
+                   description.id, 
+                   description."conceptId", 
+                   description.term, 
+                   description."typeId"
+                 FROM "TransitiveClosure" "transitiveClosure", "Description" description
+                 WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PRESENTATION_UNIT} AND 
+                       "transitiveClosure"."subtypeId" = description."conceptId" AND 
+                       unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE AND
+                       description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}
+                 ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC              
+                 LIMIT 10
+                 OFFSET 0;`
+
+  return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
+    .then(utils.handleEntityNotFound(res))
+    .then(utils.respondWithResult(res))
+    .catch(utils.handleError(res, req.requestId))
+}
+
+export function countPharmaceuticalProductByCriteria (req, res) {
   const criteria = req.query.criteria.trim()
     .split(/\s/)
     .join('%')
 
   const query = `WITH temp AS (SELECT DISTINCT description."conceptId"
                                FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                               WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE} AND
-                                     "transitiveClosure"."subtypeId" = description."conceptId" AND
+                               WHERE "transitiveClosure"."subtypeId" = description."conceptId" AND
                                      description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
-                                     unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE)
+                                     unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE AND
+                                     "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PHARMACEUTICAL_PRODUCT})
                  SELECT COUNT(*)
                  FROM temp;`
 
@@ -26,7 +51,7 @@ export function countProcedureByCriteria (req, res) {
     .catch(utils.handleError(res, req.requestId))
 }
 
-export function getProcedureByCriteria (req, res) {
+export function getPharmaceuticalProductByCriteria (req, res) {
   return new Promise((resolve, reject) => {
     const invalidParams = []
 
@@ -38,8 +63,8 @@ export function getProcedureByCriteria (req, res) {
         invalidParams: invalidParams,
         endpoint: req.originalUrl,
         method: req.method,
-        controllerFunction: getProcedureByCriteria.name,
-        message: 'procedure.params.invalid'
+        controllerFunction: getPharmaceuticalProductByCriteria.name,
+        message: 'medication.params.invalid'
       }))
     }
 
@@ -55,7 +80,7 @@ export function getProcedureByCriteria (req, res) {
                                            description.active = TRUE AND
                                            unaccent(description.term) ILIKE '%${criteria}%' AND
                                            "transitiveClosure"."subtypeId" = description."conceptId" AND
-                                           "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE}
+                                           "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PHARMACEUTICAL_PRODUCT}
                                      ORDER BY distance ASC
                                      LIMIT ${req.query.limit}
                                      OFFSET ${req.query.skip})
@@ -70,31 +95,6 @@ export function getProcedureByCriteria (req, res) {
     return resolve(sequelize.query(query, {type: sequelize.QueryTypes.SELECT}))
   })
     .then(utils.buildConceptStructure)
-    .then(utils.handleEntityNotFound(res))
-    .then(utils.respondWithResult(res))
-    .catch(utils.handleError(res, req.requestId))
-}
-
-export function getProcedureSynonymByCriteria (req, res) {
-  const criteria = req.query.criteria.trim()
-    .split(/\s/)
-    .join('%')
-
-  const query = `SELECT
-                   description.id,
-                   description."conceptId",
-                   description.term,
-                   description."typeId"
-                 FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                 WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE} AND
-                       "transitiveClosure"."subtypeId" = description."conceptId" AND
-                       unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE AND
-                       description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}
-                 ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC
-                 LIMIT 10
-                 OFFSET 0;`
-
-  return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))
     .catch(utils.handleError(res, req.requestId))

@@ -11,6 +11,10 @@
     "value": true,
     "description": ""
   },
+  "medication": {
+    "value": true,
+    "description": ""
+  },
   "procedure": {
     "value": true,
     "description": ""

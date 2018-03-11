@@ -1,6 +1,7 @@
 'use strict'
 
 import errorHandler from '../errorHandler'
+import constants from '../constants'
 
 export function respondWithResult (res, statusCode) {
   statusCode = statusCode || 200
@@ -44,4 +45,15 @@ export function secondsToTime (seconds) {
   seconds = Math.floor(seconds % 60)
 
   return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+}
+
+export function buildConceptStructure (concepts) {
+  return concepts => {
+    return concepts.filter(c => c.typeId === constants.SNOMED.TYPES.DESCRIPTION.FSN)
+      .map(procedure => {
+        procedure.synonyms = concepts.filter(c => c.typeId === constants.SNOMED.TYPES.DESCRIPTION.SYNONYM && c.conceptId === procedure.conceptId)
+
+        return procedure
+      })
+  }
 }
