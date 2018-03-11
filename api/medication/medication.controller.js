@@ -16,7 +16,7 @@ export function getPresentationByCriteria (req, res) {
                    description.term, 
                    description."typeId"
                  FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                 WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PRESENTATION_UNIT} AND 
+                 WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PRESENTATION} AND 
                        "transitiveClosure"."subtypeId" = description."conceptId" AND 
                        unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE AND
                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}

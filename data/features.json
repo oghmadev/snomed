@@ -15,6 +15,10 @@
     "value": true,
     "description": ""
   },
+  "practitioner": {
+    "value": true,
+    "description": ""
+  },
   "procedure": {
     "value": true,
     "description": ""
