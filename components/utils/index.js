@@ -48,12 +48,10 @@ export function secondsToTime (seconds) {
 }
 
 export function buildConceptStructure (concepts) {
-  return concepts => {
-    return concepts.filter(c => c.typeId === constants.SNOMED.TYPES.DESCRIPTION.FSN)
-      .map(procedure => {
-        procedure.synonyms = concepts.filter(c => c.typeId === constants.SNOMED.TYPES.DESCRIPTION.SYNONYM && c.conceptId === procedure.conceptId)
+  return concepts.filter(c => c.typeId === constants.SNOMED.TYPES.DESCRIPTION.FSN)
+    .map(procedure => {
+      procedure.synonyms = concepts.filter(c => c.typeId === constants.SNOMED.TYPES.DESCRIPTION.SYNONYM && c.conceptId === procedure.conceptId)
 
-        return procedure
-      })
-  }
+      return procedure
+    })
 }
