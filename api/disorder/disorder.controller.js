@@ -47,13 +47,12 @@ export function getDisorderByCriteria (req, res) {
       .split(/\s/)
       .join('%')
 
-    const query = `WITH concepts AS (SELECT DISTINCT
-                                       description."conceptId",
+    const query = `WITH concepts AS (SELECT
+                                       DISTINCT description."conceptId",
                                        (levenshtein('${req.query.criteria.trim()}', description.term)) AS distance
                                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
                                      WHERE description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
-                                           description.active = TRUE AND  
-                                           unaccent(description.term) ILIKE '%${criteria}%' AND
+                                           description.active = TRUE AND unaccent(description.term) ILIKE '%${criteria}%' AND
                                            "transitiveClosure"."subtypeId" = description."conceptId" AND
                                            "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.DISORDER}
                                      ORDER BY distance ASC
@@ -69,14 +68,7 @@ export function getDisorderByCriteria (req, res) {
 
     return resolve(sequelize.query(query, {type: sequelize.QueryTypes.SELECT}))
   })
-    .then(disorders => {
-      return disorders.filter(d => d.typeId === constants.SNOMED.TYPES.DESCRIPTION.FSN)
-        .map(disorder => {
-          disorder.synonyms = disorders.filter(d => d.typeId === constants.SNOMED.TYPES.DESCRIPTION.SYNONYM && d.conceptId === disorder.conceptId)
-
-          return disorder
-        })
-    })
+    .then(utils.buildConceptStructure)
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))
     .catch(utils.handleError(res, req.requestId))

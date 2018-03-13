@@ -4,7 +4,7 @@ import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
 import constants from '../../components/constants'
 
-export function getFindingsByCriteria (req, res) {
+export function getSpecialtyByCriteria (req, res) {
   const criteria = req.query.criteria.trim()
     .split(/\s/)
     .join('%')
@@ -15,7 +15,7 @@ export function getFindingsByCriteria (req, res) {
                    description.term, 
                    description."typeId"
                  FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                 WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.FINDING} AND 
+                 WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PRACTITIONER} AND 
                        "transitiveClosure"."subtypeId" = description."conceptId" AND 
                        unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE AND
                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}  

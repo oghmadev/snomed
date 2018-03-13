@@ -11,11 +11,15 @@ export default winston.createLogger({
     new winston.transports.File({
       filename: `${config.logsPath}/express.error.log`,
       maxsize: config.logMaxSize,
+      maxFiles: config.logMaxFiles,
+      tailable: true,
       level: 'error'
     }),
     new winston.transports.File({
       filename: `${config.logsPath}/express.log`,
       maxsize: config.logMaxSize,
+      maxFiles: config.logMaxFiles,
+      tailable: true,
       level: 'info'
     })]
 })

@@ -8,7 +8,7 @@ import { APIParamMissingError, FeatureUnavailableError } from '../errors'
 import { isFeatureToggled } from '../featureToggles'
 import errorHandler from '../errorHandler'
 
-export function hasRequestId () {
+function hasRequestId () {
   return compose()
     .use((req, res, next) => {
       if (req.get('X-Request-ID') == null) {
@@ -21,7 +21,7 @@ export function hasRequestId () {
     .use(verifyAPIKEY())
 }
 
-export function verifyAPIKEY () {
+function verifyAPIKEY () {
   return compose()
     .use((req, res, next) => {
       if (req.get('X-API-Key') == null) {
