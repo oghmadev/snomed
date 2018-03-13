@@ -8,7 +8,9 @@ const errorLogger = winston.createLogger({
   format: winston.format.json(),
   transports: [new winston.transports.File({
     filename: `${config.logsPath}/snomed.error.log`,
-    maxsize: config.logMaxSize
+    maxsize: config.logMaxSize,
+    maxFiles: config.logMaxFiles,
+    tailable: true
   })]
 })
 
@@ -17,7 +19,9 @@ const serverLogger = winston.createLogger({
   format: winston.format.printf(info => `${(new Date()).toISOString()},${info.message}`),
   transports: [new winston.transports.File({
     filename: `${config.logsPath}/snomed.server.log`,
-    maxsize: config.logMaxSize
+    maxsize: config.logMaxSize,
+    maxFiles: config.logMaxFiles,
+    tailable: true
   })]
 })
 
