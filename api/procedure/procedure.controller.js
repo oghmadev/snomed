@@ -15,7 +15,8 @@ export function countProcedureByCriteria (req, res) {
                                WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE} AND
                                      "transitiveClosure"."subtypeId" = description."conceptId" AND
                                      description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
-                                     unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE)
+                                     unaccent(description."term") ILIKE unaccent('%${criteria}%') AND
+                                     description.active = TRUE)
                  SELECT COUNT(*)
                  FROM temp;`
 
@@ -53,7 +54,7 @@ export function getProcedureByCriteria (req, res) {
                                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
                                      WHERE description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
                                            description.active = TRUE AND
-                                           unaccent(description.term) ILIKE '%${criteria}%' AND
+                                           unaccent(description.term) ILIKE unaccent('%${criteria}%') AND
                                            "transitiveClosure"."subtypeId" = description."conceptId" AND
                                            "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE}
                                      ORDER BY distance ASC
@@ -88,7 +89,7 @@ export function getProcedureSynonymByCriteria (req, res) {
                  FROM "TransitiveClosure" "transitiveClosure", "Description" description
                  WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PROCEDURE} AND
                        "transitiveClosure"."subtypeId" = description."conceptId" AND
-                       unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE AND
+                       unaccent(description."term") ILIKE unaccent('%${criteria}%') AND description.active = TRUE AND
                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}
                  ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC
                  LIMIT 10

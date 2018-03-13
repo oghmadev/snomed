@@ -15,7 +15,8 @@ export function countDisorderByCriteria (req, res) {
                                WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.DISORDER} AND 
                                      description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND 
                                      "transitiveClosure"."subtypeId" = description."conceptId" AND 
-                                     unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE)
+                                     unaccent(description."term") ILIKE unaccent('%${criteria}%') AND
+                                     description.active = TRUE)
                  SELECT COUNT(*)
                  FROM temp;`
 
@@ -52,8 +53,9 @@ export function getDisorderByCriteria (req, res) {
                                        (levenshtein('${req.query.criteria.trim()}', description.term)) AS distance
                                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
                                      WHERE description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
-                                           description.active = TRUE AND unaccent(description.term) ILIKE '%${criteria}%' AND
+                                           unaccent(description.term) ILIKE unaccent('%${criteria}%') AND
                                            "transitiveClosure"."subtypeId" = description."conceptId" AND
+                                           description.active = TRUE AND
                                            "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.DISORDER}
                                      ORDER BY distance ASC
                                      LIMIT ${req.query.limit}
@@ -87,7 +89,7 @@ export function getDisorderSynonymByCriteria (req, res) {
                  FROM "TransitiveClosure" "transitiveClosure", "Description" description
                  WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.DISORDER} AND 
                        "transitiveClosure"."subtypeId" = description."conceptId" AND description.active = TRUE AND
-                       unaccent(description."term") ILIKE '%${criteria}%' AND 
+                       unaccent(description."term") ILIKE unaccent('%${criteria}%') AND 
                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}
                  ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC
                  LIMIT 10
