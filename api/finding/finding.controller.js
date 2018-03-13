@@ -17,7 +17,7 @@ export function getFindingsByCriteria (req, res) {
                  FROM "TransitiveClosure" "transitiveClosure", "Description" description
                  WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.FINDING} AND 
                        "transitiveClosure"."subtypeId" = description."conceptId" AND 
-                       unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE AND
+                       unaccent(description."term") ILIKE unaccent('%${criteria}%') AND description.active = TRUE AND
                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}  
                  ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC              
                  LIMIT 10

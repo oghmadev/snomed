@@ -15,7 +15,8 @@ export function getSportsByCriteria (req, res) {
                                FROM "TransitiveClosure" "transitiveClosure", "Description" description
                                WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.SPORTS} AND
                                       "transitiveClosure"."subtypeId" = description."conceptId" AND
-                                     unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE
+                                     unaccent(description."term") ILIKE unaccent('%${criteria}%') AND
+                                     description.active = TRUE
                                ORDER BY distance ASC
                                LIMIT 10
                                OFFSET 0)

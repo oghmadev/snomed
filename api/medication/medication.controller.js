@@ -18,7 +18,7 @@ export function getPresentationByCriteria (req, res) {
                  FROM "TransitiveClosure" "transitiveClosure", "Description" description
                  WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PRESENTATION} AND 
                        "transitiveClosure"."subtypeId" = description."conceptId" AND 
-                       unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE AND
+                       unaccent(description."term") ILIKE unaccent('%${criteria}%') AND description.active = TRUE AND
                        description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}
                  ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC              
                  LIMIT 10
@@ -39,7 +39,8 @@ export function countPharmaceuticalProductByCriteria (req, res) {
                                FROM "TransitiveClosure" "transitiveClosure", "Description" description
                                WHERE "transitiveClosure"."subtypeId" = description."conceptId" AND
                                      description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
-                                     unaccent(description."term") ILIKE '%${criteria}%' AND description.active = TRUE AND
+                                     unaccent(description."term") ILIKE unaccent('%${criteria}%') AND
+                                     description.active = TRUE AND
                                      "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PHARMACEUTICAL_PRODUCT})
                  SELECT COUNT(*)
                  FROM temp;`
@@ -78,7 +79,7 @@ export function getPharmaceuticalProductByCriteria (req, res) {
                                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
                                      WHERE description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
                                            description.active = TRUE AND
-                                           unaccent(description.term) ILIKE '%${criteria}%' AND
+                                           unaccent(description.term) ILIKE unaccent('%${criteria}%') AND
                                            "transitiveClosure"."subtypeId" = description."conceptId" AND
                                            "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PHARMACEUTICAL_PRODUCT}
                                      ORDER BY distance ASC
