@@ -3,6 +3,7 @@
 function set_env {
   export USER_ID=$(id -u)
   export GROUP_ID=$(id -g)
+  export ROOT_CONTEXT=${PWD}
 }
 
 function check_network {
@@ -20,18 +21,18 @@ function check_network {
 function update {
   set_env
   echo "Building docker image..."
-  docker-compose build
+  docker-compose -f docker/development/docker-compose.yml build
   echo "Updating node dependencies..."
-  docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${PWD}:/usr/app/snomed" snomed_api npm install
+  docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${ROOT_CONTEXT}:/usr/app/snomed" snomed_api:development npm install
 }
 
 function build {
   set_env
-  docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${PWD}:/usr/app/snomed" snomed_api gulp build
+  docker run --rm --user "${USER_ID}:${GROUP_ID}" -v "${ROOT_CONTEXT}:/usr/app/snomed" snomed_api:development gulp build
 }
 
 function print_usage {
-  echo "Usage: $0 [-b] [-i] [-u] [-s] [-d]"
+  echo "Usage: $0 [-i] [-b] [-u] [-s] [-d]"
   echo "  -i Do initial configuration"
   echo "  -b Build the project"
   echo "  -u Update node image and dependencies"
@@ -49,8 +50,8 @@ while getopts "ibusdh" OPT; do
     i) check_network; update;;
     b) build;;
     u) update;;
-    s) set_env; docker-compose up;;
-    d) set_env; docker-compose down;;
+    s) set_env; docker-compose -f docker/development/docker-compose.yml up;;
+    d) set_env; docker-compose -f docker/development/docker-compose.yml down;;
     h) print_usage; exit 0;;
   esac
 done

@@ -13,6 +13,7 @@ import { Instrumenter } from 'isparta'
 let config
 const plugins = gulpLoadPlugins()
 const appPath = 'app'
+const dataPath = 'data'
 const distPath = 'dist'
 const dockerPath = 'docker'
 const scripts = {
@@ -164,7 +165,7 @@ gulp.task('webdriver_update', webdriver_update)
  ********************/
 
 gulp.task('build', cb => {
-  runSequence(['clean:dist', 'clean:tmp'], 'transpile', ['copy', 'copy:docker'], cb)
+  runSequence(['clean:dist', 'clean:tmp'], 'transpile', ['copy', 'copy:data', 'copy:docker'], cb)
 })
 
 gulp.task('clean:dist', () => del([`${distPath}/!(.git*|.openshift|Procfile)**`], {dot: true}))
@@ -172,5 +173,8 @@ gulp.task('clean:dist', () => del([`${distPath}/!(.git*|.openshift|Procfile)**`]
 gulp.task('copy', () => gulp.src(['package.json', 'package-lock.json'], {cwdbase: true})
   .pipe(gulp.dest(distPath)))
 
-gulp.task('copy:docker', () => gulp.src([`${dockerPath}/**/*`, `${dockerPath}/.env`])
+gulp.task('copy:data', () => gulp.src([`${dataPath}/**/*`], {cwdbase: true})
+  .pipe(gulp.dest(distPath)))
+
+gulp.task('copy:docker', () => gulp.src([`${dockerPath}/staging/**/*`, `${dockerPath}/staging/.env`])
   .pipe(gulp.dest(distPath)))

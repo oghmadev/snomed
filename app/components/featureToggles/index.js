@@ -3,7 +3,7 @@
 import fs from 'fs'
 import config from '../../config/environment'
 import { FeatureFileError, FeatureFileMissingError, InvalidFeatureNameError } from '../../components/errors'
-import featureToggles from '../../data/features'
+import featureToggles from '../../../data/features'
 
 let FEATURES = []
 let features = {}

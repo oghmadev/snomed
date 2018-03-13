@@ -95,8 +95,8 @@
     "supertest": "^1.1.0"
   },
   "engines": {
-    "node": "^8.9.0",
-    "npm": "^5.5.1"
+    "node": "^8.10.0",
+    "npm": "^5.6.0"
   },
   "scripts": {
     "test": "standard && gulp test",

@@ -2,14 +2,16 @@ version: '3.4'
 services:
   api:
     user: ${USER_ID}:${GROUP_ID}
+    image: snomed_api:development
     build:
       args:
         - NODE_VERSION
       context: .
+      dockerfile: ./build/api
     depends_on:
       - database
     volumes:
-      - "${PWD}:/usr/app/snomed"
+      - "${ROOT_CONTEXT}:/usr/app/snomed"
     networks:
       default:
         aliases:
