@@ -2,21 +2,46 @@
 
 import * as utils from '../../components/utils'
 import { sequelize } from '../../sqldb'
-import { APIParamInvalidError } from '../../components/errors'
 import constants from '../../components/constants'
+import { APIParamInvalidError } from '../../components/errors'
 
-export function countDisorderByCriteria (req, res) {
+export function getPresentationByCriteria (req, res) {
+  const criteria = req.query.criteria.trim()
+    .split(/\s/)
+    .join('%')
+
+  const query = `SELECT 
+                   description.id, 
+                   description."conceptId", 
+                   description.term, 
+                   description."typeId"
+                 FROM "TransitiveClosure" "transitiveClosure", "Description" description
+                 WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PRESENTATION} AND 
+                       "transitiveClosure"."subtypeId" = description."conceptId" AND 
+                       unaccent(description."term") ILIKE unaccent('%${criteria}%') AND description.active = TRUE AND
+                       description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}
+                 ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC              
+                 LIMIT 10
+                 OFFSET 0;`
+
+  return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
+    .then(utils.handleEntityNotFound(res))
+    .then(utils.respondWithResult(res))
+    .catch(utils.handleError(res, req.requestId))
+}
+
+export function countPharmaceuticalProductByCriteria (req, res) {
   const criteria = req.query.criteria.trim()
     .split(/\s/)
     .join('%')
 
   const query = `WITH temp AS (SELECT DISTINCT description."conceptId"
                                FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                               WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.DISORDER} AND 
-                                     description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND 
-                                     "transitiveClosure"."subtypeId" = description."conceptId" AND 
+                               WHERE "transitiveClosure"."subtypeId" = description."conceptId" AND
+                                     description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
                                      unaccent(description."term") ILIKE unaccent('%${criteria}%') AND
-                                     description.active = TRUE)
+                                     description.active = TRUE AND
+                                     "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PHARMACEUTICAL_PRODUCT})
                  SELECT COUNT(*)
                  FROM temp;`
 
@@ -27,7 +52,7 @@ export function countDisorderByCriteria (req, res) {
     .catch(utils.handleError(res, req.requestId))
 }
 
-export function getDisorderByCriteria (req, res) {
+export function getPharmaceuticalProductByCriteria (req, res) {
   return new Promise((resolve, reject) => {
     const invalidParams = []
 
@@ -39,8 +64,8 @@ export function getDisorderByCriteria (req, res) {
         invalidParams: invalidParams,
         endpoint: req.originalUrl,
         method: req.method,
-        controllerFunction: getDisorderByCriteria.name,
-        message: 'disorder.params.invalid'
+        controllerFunction: getPharmaceuticalProductByCriteria.name,
+        message: 'medication.params.invalid'
       }))
     }
 
@@ -53,10 +78,10 @@ export function getDisorderByCriteria (req, res) {
                                        (levenshtein('${req.query.criteria.trim()}', description.term)) AS distance
                                      FROM "TransitiveClosure" "transitiveClosure", "Description" description
                                      WHERE description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM} AND
+                                           description.active = TRUE AND
                                            unaccent(description.term) ILIKE unaccent('%${criteria}%') AND
                                            "transitiveClosure"."subtypeId" = description."conceptId" AND
-                                           description.active = TRUE AND
-                                           "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.DISORDER}
+                                           "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.PHARMACEUTICAL_PRODUCT}
                                      ORDER BY distance ASC
                                      LIMIT ${req.query.limit}
                                      OFFSET ${req.query.skip})
@@ -71,31 +96,6 @@ export function getDisorderByCriteria (req, res) {
     return resolve(sequelize.query(query, {type: sequelize.QueryTypes.SELECT}))
   })
     .then(utils.buildConceptStructure)
-    .then(utils.handleEntityNotFound(res))
-    .then(utils.respondWithResult(res))
-    .catch(utils.handleError(res, req.requestId))
-}
-
-export function getDisorderSynonymByCriteria (req, res) {
-  const criteria = req.query.criteria.trim()
-    .split(/\s/)
-    .join('%')
-
-  const query = `SELECT 
-                   description.id, 
-                   description."conceptId", 
-                   description.term, 
-                   description."typeId"
-                 FROM "TransitiveClosure" "transitiveClosure", "Description" description
-                 WHERE "transitiveClosure"."supertypeId" = ${constants.SNOMED.HIERARCHY.DISORDER} AND 
-                       "transitiveClosure"."subtypeId" = description."conceptId" AND description.active = TRUE AND
-                       unaccent(description."term") ILIKE unaccent('%${criteria}%') AND 
-                       description."typeId" = ${constants.SNOMED.TYPES.DESCRIPTION.SYNONYM}
-                 ORDER BY levenshtein('${req.query.criteria.trim()}', description.term) ASC
-                 LIMIT 10
-                 OFFSET 0;`
-
-  return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))
     .catch(utils.handleError(res, req.requestId))

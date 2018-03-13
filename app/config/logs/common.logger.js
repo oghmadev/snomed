@@ -13,6 +13,8 @@ export default winston.createLogger({
     new winston.transports.File({
       filename: `${config.logsPath}/common.error.log`,
       maxsize: config.logMaxSize,
+      maxFiles: config.logMaxFiles,
+      tailable: true,
       level: 'error'
     })
   ]

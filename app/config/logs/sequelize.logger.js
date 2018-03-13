@@ -8,7 +8,9 @@ const fileLogger = winston.createLogger({
   format: winston.format.json(),
   transports: [new winston.transports.File({
     filename: `${config.logsPath}/database.error.log`,
-    maxsize: config.logMaxSize
+    maxsize: config.logMaxSize,
+    maxFiles: config.logMaxFiles,
+    tailable: true
   })]
 })
 

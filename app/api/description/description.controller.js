@@ -47,14 +47,7 @@ export function getComplete (req, res) {
                  WHERE description."conceptId" = ${req.params.id} AND description.active = TRUE;`
 
   return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
-    .then(concepts => {
-      return concepts.filter(c => c.typeId === constants.SNOMED.TYPES.DESCRIPTION.FSN)
-        .map(concept => {
-          concept.synonyms = concepts.filter(c => c.typeId === constants.SNOMED.TYPES.DESCRIPTION.SYNONYM && c.conceptId === concept.conceptId)
-
-          return concept
-        })[0]
-    })
+    .then(concepts => utils.buildConceptStructure(concepts)[0])
     .then(utils.handleEntityNotFound(res))
     .then(utils.respondWithResult(res))
     .catch(utils.handleError(res, req.requestId))

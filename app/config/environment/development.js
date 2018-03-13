@@ -29,5 +29,6 @@ module.exports = {
   dataPath: dataPath,
   logsPath: logsPath,
   commonLogLevel: 'info',
-  logMaxSize: 1024 * 1024 * 100
+  logMaxSize: 1000 * 1000 * 100,
+  logMaxFiles: 10
 }
