@@ -22,6 +22,11 @@ services:
 
   database:
     image: postgres:${POSTGRES_VERSION}
+    ports:
+      - target: 5432
+        published: 6100
+        protocol: tcp
+        mode: host
     environment:
       - POSTGRES_DB=snomed-dev
       - POSTGRES_USER=snomed-dev
