@@ -1,38 +1,42 @@
 version: '3.4'
 services:
-  app:
+  api:
     user: ${USER_ID}:${GROUP_ID}
+    image: snomed_api:development
     build:
       args:
         - NODE_VERSION
       context: .
-    ports:
-      - "9000:9000"
+      dockerfile: ./build/api
     depends_on:
       - database
     volumes:
-      - "${PWD}:/usr/app/snomed"
+      - "${ROOT_CONTEXT}:/usr/app/snomed"
     networks:
       default:
-      backend:
         aliases:
-          - snomed-app
+          - snomed-api
+      tuatha-de-danann:
+        aliases:
+          - snomed-api
 
   database:
     image: postgres:${POSTGRES_VERSION}
     ports:
-      - "6100:5432"
+      - target: 5432
+        published: 6100
+        protocol: tcp
+        mode: host
     environment:
       - POSTGRES_DB=snomed-dev
       - POSTGRES_USER=snomed-dev
       - POSTGRES_PASSWORD=test
     networks:
       default:
-      backend:
         aliases:
           - snomed-db
 
 networks:
   default:
-  backend:
+  tuatha-de-danann:
     external: true

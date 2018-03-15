@@ -1,0 +1,42 @@
+version: '3.4'
+services:
+  api:
+    image: snomed-api
+    build:
+      args:
+        - NODE_VERSION
+      context: .
+      dockerfile: ./build/api
+    restart: unless-stopped
+    depends_on:
+      - database
+    networks:
+      data:
+        aliases:
+          - snomed-api
+      tuatha-de-danann:
+        aliases:
+          - snomed-api
+    volumes:
+      - "${STORAGE_DIR}/logs:/usr/app/snomed/logs"
+      - "${SECRETS_DIRECTORY}/db.conf.js:${SECRETS_DIRECTORY}/db.conf.js:ro"
+
+  database:
+    image: postgres:${POSTGRES_VERSION}
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD_FILE
+    networks:
+      data:
+        aliases:
+          - snomed-db
+    volumes:
+      - "${STORAGE_DIR}/data:/var/lib/postgresql/data"
+      - "${SECRETS_DIRECTORY}/pgpass:${SECRETS_DIRECTORY}/pgpass:ro"
+
+networks:
+  data:
+  tuatha-de-danann:
+    external: true

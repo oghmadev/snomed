@@ -2,4 +2,5 @@ ARG NODE_VERSION
 FROM node:${NODE_VERSION}
 WORKDIR /usr/app/snomed
 RUN ["npm", "install", "-g", "gulp-cli"]
+EXPOSE 8080
 CMD ["gulp", "serve"]

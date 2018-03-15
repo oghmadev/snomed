@@ -2,7 +2,7 @@
 
 TEMP_PATH="/tmp/relationship"
 BIN_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
-DATA_PATH="${BIN_PATH}/data"
+DATA_PATH="${BIN_PATH}/init/data"
 
 cp "${DATA_PATH}/sct2_Relationship_Snapshot_INT_20180131.txt" "${TEMP_PATH}.txt"
 sed '1d' "${DATA_PATH}/sct2_Relationship_SpanishExtensionSnapshot_INT_20171031.txt" >> "${TEMP_PATH}.txt"

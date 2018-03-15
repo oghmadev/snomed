@@ -1,6 +1,6 @@
 'use strict'
 
-import { version } from './package'
+import { version } from '../package'
 import { getFeatureNames } from './components/featureToggles'
 
 export default function (app) {

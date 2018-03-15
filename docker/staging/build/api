@@ -1,0 +1,11 @@
+ARG NODE_VERSION
+FROM node:${NODE_VERSION}
+WORKDIR /usr/app/snomed
+ENV NODE_ENV=production
+ADD package.json /usr/app/snomed
+ADD package-lock.json /usr/app/snomed
+ADD app /usr/app/snomed/app
+ADD data /usr/app/snomed/data
+RUN npm install
+EXPOSE 8080
+CMD ["npm", "start"]
