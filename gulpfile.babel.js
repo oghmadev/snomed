@@ -16,11 +16,12 @@ const appPath = 'app'
 const dataPath = 'data'
 const distPath = 'dist'
 const dockerPath = 'docker'
+const test = 'test'
 const scripts = {
   app: [`${appPath}/**/!(*.spec|*.integration).js`],
   test: {
-    integration: [`${appPath}/**/*.integration.js`, 'mocha.global.js'],
-    unit: [`${appPath}/**/*.spec.js`, 'mocha.global.js']
+    integration: [`${test}/**/*.integration.js`],
+    unit: [`${test}/**/*.spec.js`]
   }
 }
 
