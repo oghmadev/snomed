@@ -39,7 +39,14 @@ function verifyAPIKEY () {
 
 export function logRequest (controllerName, functionName) {
   return (req, res, next) => {
-    logger.snomed.server.info(`${req.get('X-Request-ID')},${controllerName}.${functionName},${req.user != null ? req.user.id : 'null'}`)
+    logger.snomed.server.log({
+      level: 'info',
+      timestamp: (new Date()).toISOString(),
+      controllerName,
+      functionName,
+      requestId: req.get('X-Request-ID'),
+      userId: req.user != null ? req.user.id : 'null'
+    })
 
     return next()
   }
