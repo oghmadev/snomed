@@ -17,12 +17,19 @@ require('./config/express').default(app)
 require('./routes').default(app)
 
 function startServer () {
-  app.snomedService = server.listen(config.port, config.ip, () => logger.common.info(`Express server listening on ${config.port}, in ${app.get('env')} mode`))
+  app.snomedService = server.listen(config.port, config.ip, () => logger.common.console.info(`Express server listening on ${config.port}, in ${app.get('env')} mode`))
 }
 
 sqldb.sequelize.sync()
   .then(startServer)
-  .catch(err => logger.common.error(`Server failed to start due to error: ${err}`))
+  .catch(err => {
+    logger.common.console.error(`Server failed to start due to error: ${err}`)
+    logger.common.file.log({
+      level: 'error',
+      timestamp: (new Date()).toISOString(),
+      message: `Server failed to start due to error: ${err}`
+    })
+  })
 
 const unhandledRejections = new Map()
 

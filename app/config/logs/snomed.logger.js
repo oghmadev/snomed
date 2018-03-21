@@ -16,7 +16,7 @@ const errorLogger = winston.createLogger({
 
 const serverLogger = winston.createLogger({
   level: 'info',
-  format: winston.format.printf(info => `${(new Date()).toISOString()},${info.message}`),
+  format: winston.format.json(),
   transports: [new winston.transports.File({
     filename: `${config.logsPath}/snomed.server.log`,
     maxsize: config.logMaxSize,
